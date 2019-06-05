@@ -17,10 +17,13 @@ for i in sub*; do
 
 	[ $i == sub-4685 ]; test=$?
 
-    sbatch \
-    -o ${outDir}/output_TS2_${i}.txt \
-    -e ${outDir}/error_TS2_${i}.txt \
-    ${scriptDir}/Task_step2_sbatch_regress.sh $i $test
+	if [ -f ${i}/run-1_Test_scale+tlrc.HEAD ]; then
+		
+	    sbatch \
+	    -o ${outDir}/output_TS2_${i}.txt \
+	    -e ${outDir}/error_TS2_${i}.txt \
+	    ${scriptDir}/Task_step2_sbatch_regress.sh $i $test
 
-    sleep 1
+	    sleep 1
+	fi
 done
