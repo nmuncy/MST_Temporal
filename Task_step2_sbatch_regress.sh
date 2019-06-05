@@ -92,11 +92,6 @@ fi
 
 
 
-
-
-
-
-
 ### --- Set up --- ###
 #
 # Determine number of phases, and number of blocks per phase
