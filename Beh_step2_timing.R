@@ -110,7 +110,7 @@ for(j in subjList){
   
   ### Behaviors 
   # This is hardcoded to avoid a conditional nightmare - hooray for "which"!
-  # Name variables ind_beh_Foo for later use
+  # Name variables ind_beh_Foo for later catch
   # T1=1.5s, T2=1s
   # Combine behaviors (ind_beh_Foo_ALL) since some bins are very small
   
@@ -129,7 +129,11 @@ for(j in subjList){
   ind_beh_FA_All <- sort(c(ind_beh_FA_Long_L1,ind_beh_FA_Same_L1,ind_beh_FA_Same_L2,ind_beh_FA_Short_L2))
   ind_beh_CR_All <- sort(c(ind_beh_CR_Long_L2,ind_beh_CR_Short_L1))
   
-
+  # Foils, Non/multiple responses
+  ind_beh_Foil_All <- which(hold_stim_typ=="Foil" & hold_response!=999)
+  ind_beh_NR_All <- which(hold_response==999)
+  
+  
   
   
   ### Determine start:dur for each behavior
@@ -137,13 +141,18 @@ for(j in subjList){
   # Use indices to keep trials straight
   # Make sure the beginning of each block has t=0
 
-  # get behavior variables
+  # get behavior variables, set nr_status opposite (T) for conditional check
   beh_list <- gsub("ind_beh_","",ls(pattern="ind_beh"))
-  
   for(a in beh_list){
     
     # behavior positions (index)
     ind_a <- get(paste0("ind_beh_",a))
+    
+    # set NR/Foil status for encoding trials
+    nr_status = TRUE
+    if(a == "NR_All" | a == "Foil_All"){
+      nr_status = FALSE
+    }
 
     # separate by block
     for(block in 1:numBlock){
@@ -157,18 +166,19 @@ for(j in subjList){
       hold_df_stim <- read.delim(paste0(subjDir,"/",j,"_B",block,"_stimuli.txt"), header=T, sep="\t")
       df_1st_present <- subset(hold_df_stim, hold_df_stim$Repeat == "No" & (hold_df_stim$StimType == "Targ" | hold_df_stim$StimType == "Lure"))
       row.names(df_1st_present) <- 1:dim(df_1st_present)[1]
-      
-      # set output (which line of TF to write), for encoding (Response preceding) and behavior trials
-      hold_block <- paste0("TF_line",block,"_",a)
-      hold_block_precede <- paste0("TF_line",block,"_Rp",a)
-      assign(hold_block,NA); assign(hold_block_precede,NA)
-      
+        
+      # set output (which line of TF to write), for encoding (Response preceding) and behavior trials. No NRs.
+      hold_block <- paste0("TF_line",block,"_",a); assign(hold_block,NA); 
+      if(nr_status){
+        hold_block_precede <- paste0("TF_line",block,"_Rp",a)
+        assign(hold_block_precede,NA)
+      }
+
       
       ## Split behavior into blocks
       # The first-presentation info was read in from stimulus text file.
       # It is already broken into blocks, but the behaviors are not so
       # these have to be matched up.
-      
       for(b in ind_a){
         if(b %in% seq(LB,UB)==T){
         
@@ -181,39 +191,48 @@ for(j in subjList){
           trial_num <- df_1st_present[ind_match,1]
         
           # determine start, duration of behavior (dur = start to decision, not entire available response time)
+          # account for NR response issues
           hold_start <- round((hold_resp_onset[b]-time_zero),1)
-          hold_dur <- round(((hold_resp_time[b]-time_zero)-hold_start),1)
+          if(nr_status){
+            hold_dur <- round(((hold_resp_time[b]-time_zero)-hold_start),1)
+          }else{
+            hold_dur <- round(((hold_trial_end[b]-time_zero)-hold_start),1)
+          }
           TF_input <- paste0(hold_start,":",hold_dur)
-          
-          # determine start, duration of encoding (Response preceding behavior)
-          total_trial_num <- trial_num+LB-1
-          hold_start_enc <- round((hold_resp_onset[total_trial_num]-time_zero),1)
-          hold_dur_enc <- round(((hold_resp_time[total_trial_num]-time_zero)-hold_start_enc),1)
-          TF_input_enc <- paste0(hold_start_enc,":",hold_dur_enc)
-        
-          # write block timing
           assign(hold_block,c(get(hold_block),TF_input))
-          assign(hold_block_precede,c(get(hold_block_precede),TF_input_enc))
+          
+          # Determine start, duration of encoding (Response preceding behavior). No NRs
+          if(nr_status){
+            total_trial_num <- trial_num+LB-1
+            hold_start_enc <- round((hold_resp_onset[total_trial_num]-time_zero),1)
+            hold_dur_enc <- round(((hold_resp_time[total_trial_num]-time_zero)-hold_start_enc),1)
+            TF_input_enc <- paste0(hold_start_enc,":",hold_dur_enc)
+            assign(hold_block_precede,c(get(hold_block_precede),TF_input_enc))
+          }
         }
       }
       
-      # remove NAs
+      # remove NAs. No NRs for encoding
       assign(hold_block,get(hold_block)[-1])
-      assign(hold_block_precede,get(hold_block_precede)[-1])
+      
+      if(nr_status){
+        assign(hold_block_precede,get(hold_block_precede)[-1])
+      }
     }
     
-    # fill empty lines with "*"
+    # fill empty lines with "*". No NRs for encoding
     for(e in 1:numBlock){
       
       hold_tf <- get(paste0("TF_line",e,"_",a))
-      hold_tf_enc <- get(paste0("TF_line",e,"_Rp",a))
-      
       if(length(hold_tf)==0){
         assign(paste0("TF_line",e,"_",a),"*")
       }
-      
-      if(length(hold_tf_enc)==0){
-        assign(paste0("TF_line",e,"_Rp",a),"*")
+
+      if(nr_status){
+        hold_tf_enc <- get(paste0("TF_line",e,"_Rp",a))      
+        if(length(hold_tf_enc)==0){
+          assign(paste0("TF_line",e,"_Rp",a),"*")
+        }
       }
     }
   }
@@ -224,7 +243,7 @@ for(j in subjList){
   ### Write Timing Files
   # Only write out "All" TFs due to small bins
   # Write one line per fMRI run/block
-  
+
   for (out in beh_list) {
     if(grepl("All",out)==T){
       
@@ -238,15 +257,17 @@ for(j in subjList){
       cat(hold2, "\n", file=outFile1, append=T, sep='\t')
       cat(hold3, "\n", file=outFile1, append=T, sep='\t')
       
-      # encoding preceding behavior TFs
-      hold4 <- get(paste0("TF_line1_Rp",out))
-      hold5 <- get(paste0("TF_line2_Rp",out))
-      hold6 <- get(paste0("TF_line3_Rp",out))
-      
-      outFile2 <- paste0(outDir,j,"_TF_Rp",out,".txt")
-      cat(hold4, "\n", file=outFile2, append=F, sep='\t')
-      cat(hold5, "\n", file=outFile2, append=T, sep='\t')
-      cat(hold6, "\n", file=outFile2, append=T, sep='\t')
+      # encoding preceding behavior TFs. No NRs.
+      if(out != "NR_All" & out != "Foil_All"){
+        hold4 <- get(paste0("TF_line1_Rp",out))
+        hold5 <- get(paste0("TF_line2_Rp",out))
+        hold6 <- get(paste0("TF_line3_Rp",out))
+        
+        outFile2 <- paste0(outDir,j,"_TF_Rp",out,".txt")
+        cat(hold4, "\n", file=outFile2, append=F, sep='\t')
+        cat(hold5, "\n", file=outFile2, append=T, sep='\t')
+        cat(hold6, "\n", file=outFile2, append=T, sep='\t')
+      }
     }
   }
 }
