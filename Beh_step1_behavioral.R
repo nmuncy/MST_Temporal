@@ -13,10 +13,10 @@ makeData <- 1
 runStats <- 1
 makeGraphs <- 0
 
-# Variables
-res.Old <- " 1"
-res.Sim <- " 2"
-res.New <- " 3"
+# Variables, capture key-presses
+res.Long <- " 1"
+res.Same <- " 2"
+res.Short <- " 3"
 
 
 ### Functions
@@ -128,11 +128,9 @@ if(makeData == 1){
   # Prepare output
   master.mem <- matrix(NA,nrow=0,ncol=35)
   colnames(master.mem) <- c("Subj","Age","Sex","n.TargR4_T1","n.TargR12_T1","n.TargR4_T2","n.TargR12_T2","n.LureR4_T1","n.LureR12_T1","n.LureR4_T2","n.LureR12_T2","n.Hit4_Same_T1","n.Hit12_Same_T1","n.Hit4_Same_T2","n.Hit12_Same_T2","n.Miss4_Long_T1","n.Miss12_Long_T1","n.Miss4_Short_T1","n.Miss12_Short_T1","n.Miss4_Long_T2","n.Miss12_Long_T2","n.Miss4_Short_T2","n.Miss12_Short_T2","n.CR4_Short_T1","n.CR12_Short_T1","n.CR4_Long_T2","n.CR12_Long_T2","n.FA4_Long_T1","n.FA12_Long_T1","n.FA4_Same_T1","n.FA12_Same_T1","n.FA4_Short_T2","n.FA12_Short_T2","n.FA4_Same_T2","n.FA12_Same_T2")
-  # master.pos <- matrix(NA,nrow=length(subjList),ncol=15)
-  
 
-  # j<-"p002"
-  
+
+  # j<-"sub-5088"
   for(j in subjList){
     
     subjDir <- paste0(workDir,j,"/")
@@ -153,10 +151,18 @@ if(makeData == 1){
     ind.mem <- ind.mem[-1]
     
     
+    
+    
+    #### To Do: Strip of training trials
+    
+    
+    
+    
     ### Decode memory output
     df.mem <- as.data.frame(matrix(NA,nrow=length(ind.mem),ncol=7))
     colnames(df.mem) <- c("TrialNum","Type","Duration","Repeat","Lag","Response","Behavior")
     
+    # i <- 1
     for(i in 1:length(ind.mem)){
       
       # TrialNum, Type, Duration, Repeat, Lag
@@ -175,232 +181,277 @@ if(makeData == 1){
         df.mem[i,6] <- 999
       }
       
-      # Behavior
-      # b = long, n = same, m = short
-      h.typ <- df.mem[i,2]
-      h.dur <- df.mem[i,3]
-      h.rep <- df.mem[i,4]
-      h.lag <- df.mem[i,5]
-      h.res <- df.mem[i,6]
+      # strip spaces
+      for(k in 2:6){
+        df.mem[i,k] <- gsub(" ","",df.mem[i,k],fixed=T)
+      }
       
-      if(h.rep == " Yes"){
-        if(h.lag == " 4"){
-          if(h.dur == " T1"){
-            if(h.typ == " Targ"){
-              if(h.res == res.Old){
-                df.mem[i,7] <- "Miss_Long_T1_4"
-              }else if(h.res == res.Sim){
-                df.mem[i,7] <- "Hit_Same_T1_4"
-              }else if(h.res == res.New){
-                df.mem[i,7] <- "Miss_Short_T1_4"
-              }else{df.mem[i,7] <- 999}
-            }else{
-              if(h.res == res.Old){
-                df.mem[i,7] <- "FA_Long_T1_4"
-              }else if(h.res == res.Sim){
-                df.mem[i,7] <- "FA_Same_T1_4"
-              }else if(h.res == res.New){
-                df.mem[i,7] <- "CR_Short_T1_4"
-              }else{df.mem[i,7] <- 999}
-            }
-          }else{
-            if(h.typ == " Targ"){
-              if(h.res == res.Old){
-                df.mem[i,7] <- "Miss_Long_T2_4"
-              }else if(h.res == res.Sim){
-                df.mem[i,7] <- "Hit_Same_T2_4"
-              }else if(h.res == res.New){
-                df.mem[i,7] <- "Miss_Short_T2_4"
-              }else{df.mem[i,7] <- 999}
-            }else{
-              if(h.res == res.Old){
-                df.mem[i,7] <- "CR_Long_T2_4"
-              }else if(h.res == res.Sim){
-                df.mem[i,7] <- "FA_Same_T2_4"
-              }else if(h.res == res.New){
-                df.mem[i,7] <- "FA_Short_T2_4"
-              }else{df.mem[i,7] <- 999}
-            }
-          }
-        }else if(h.lag == " 12"){
-          if(h.dur == " T1"){
-            if(h.typ == " Targ"){
-              if(h.res == res.Old){
-                df.mem[i,7] <- "Miss_Long_T1_12"
-              }else if(h.res == res.Sim){
-                df.mem[i,7] <- "Hit_Same_T1_12"
-              }else if(h.res == res.New){
-                df.mem[i,7] <- "Miss_Short_T1_12"
-              }else{df.mem[i,7] <- 999}
-            }else{
-              if(h.res == res.Old){
-                df.mem[i,7] <- "FA_Long_T1_12"
-              }else if(h.res == res.Sim){
-                df.mem[i,7] <- "FA_Same_T1_12"
-              }else if(h.res == res.New){
-                df.mem[i,7] <- "CR_Short_T1_12"
-              }else{df.mem[i,7] <- 999}
-            }
-          }else{
-            if(h.typ == " Targ"){
-              if(h.res == res.Old){
-                df.mem[i,7] <- "Miss_Long_T2_12"
-              }else if(h.res == res.Sim){
-                df.mem[i,7] <- "Hit_Same_T2_12"
-              }else if(h.res == res.New){
-                df.mem[i,7] <- "Miss_Short_T2_12"
-              }else{df.mem[i,7] <- 999}
-            }else{
-              if(h.res == res.Old){
-                df.mem[i,7] <- "CR_Long_T2_12"
-              }else if(h.res == res.Sim){
-                df.mem[i,7] <- "FA_Same_T2_12"
-              }else if(h.res == res.New){
-                df.mem[i,7] <- "FA_Short_T2_12"
-              }else{df.mem[i,7] <- 999}
-            }
-          }
-        }
-      }else{df.mem[i,7] <- "EncR"}
+      
+      # # Behavior
+      # # 1 = long, 2 = same, 3 = short
+      # h.typ <- df.mem[i,2]
+      # h.dur <- df.mem[i,3]
+      # h.rep <- df.mem[i,4]
+      # h.lag <- df.mem[i,5]
+      # h.res <- df.mem[i,6]
+      
+      
+      
+      ### Update: let's see if we can avoid this conditional mess
+      # build the df.mem and then use "which" to figure out behaviors
+      
+      
+      # if(h.rep == " Yes"){
+      #   if(h.lag == " 4"){
+      #     if(h.dur == " T1"){
+      #       if(h.typ == " Targ"){
+      #         if(h.res == res.Long){
+      #           df.mem[i,7] <- "Miss_Long_T1_4"
+      #         }else if(h.res == res.Same){
+      #           df.mem[i,7] <- "Hit_Same_T1_4"
+      #         }else if(h.res == res.Short){
+      #           df.mem[i,7] <- "Miss_Short_T1_4"
+      #         }else{df.mem[i,7] <- 999}
+      #       }else{
+      #         if(h.res == res.Long){
+      #           df.mem[i,7] <- "FA_Long_T1_4"
+      #         }else if(h.res == res.Same){
+      #           df.mem[i,7] <- "FA_Same_T1_4"
+      #         }else if(h.res == res.Short){
+      #           df.mem[i,7] <- "CR_Short_T1_4"
+      #         }else{df.mem[i,7] <- 999}
+      #       }
+      #     }else{
+      #       if(h.typ == " Targ"){
+      #         if(h.res == res.Long){
+      #           df.mem[i,7] <- "Miss_Long_T2_4"
+      #         }else if(h.res == res.Same){
+      #           df.mem[i,7] <- "Hit_Same_T2_4"
+      #         }else if(h.res == res.Short){
+      #           df.mem[i,7] <- "Miss_Short_T2_4"
+      #         }else{df.mem[i,7] <- 999}
+      #       }else{
+      #         if(h.res == res.Long){
+      #           df.mem[i,7] <- "CR_Long_T2_4"
+      #         }else if(h.res == res.Same){
+      #           df.mem[i,7] <- "FA_Same_T2_4"
+      #         }else if(h.res == res.Short){
+      #           df.mem[i,7] <- "FA_Short_T2_4"
+      #         }else{df.mem[i,7] <- 999}
+      #       }
+      #     }
+      #   }else if(h.lag == " 12"){
+      #     if(h.dur == " T1"){
+      #       if(h.typ == " Targ"){
+      #         if(h.res == res.Long){
+      #           df.mem[i,7] <- "Miss_Long_T1_12"
+      #         }else if(h.res == res.Same){
+      #           df.mem[i,7] <- "Hit_Same_T1_12"
+      #         }else if(h.res == res.Short){
+      #           df.mem[i,7] <- "Miss_Short_T1_12"
+      #         }else{df.mem[i,7] <- 999}
+      #       }else{
+      #         if(h.res == res.Long){
+      #           df.mem[i,7] <- "FA_Long_T1_12"
+      #         }else if(h.res == res.Same){
+      #           df.mem[i,7] <- "FA_Same_T1_12"
+      #         }else if(h.res == res.Short){
+      #           df.mem[i,7] <- "CR_Short_T1_12"
+      #         }else{df.mem[i,7] <- 999}
+      #       }
+      #     }else{
+      #       if(h.typ == " Targ"){
+      #         if(h.res == res.Long){
+      #           df.mem[i,7] <- "Miss_Long_T2_12"
+      #         }else if(h.res == res.Same){
+      #           df.mem[i,7] <- "Hit_Same_T2_12"
+      #         }else if(h.res == res.Short){
+      #           df.mem[i,7] <- "Miss_Short_T2_12"
+      #         }else{df.mem[i,7] <- 999}
+      #       }else{
+      #         if(h.res == res.Long){
+      #           df.mem[i,7] <- "CR_Long_T2_12"
+      #         }else if(h.res == res.Same){
+      #           df.mem[i,7] <- "FA_Same_T2_12"
+      #         }else if(h.res == res.Short){
+      #           df.mem[i,7] <- "FA_Short_T2_12"
+      #         }else{df.mem[i,7] <- 999}
+      #       }
+      #     }
+      #   }
+      # }else{
+      #   df.mem[i,7] <- "EncR"
+      # }
     }
     
+    
+    
+    ### Figure out behaviors
+    ind_HST1 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="2" & df.mem$Duration=="T1")
+    ind_HST2 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="2" & df.mem$Duration=="T2")
+    ind_MLT1 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="1" & df.mem$Duration=="T1")
+    ind_MLT2 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="1" & df.mem$Duration=="T2")
+    ind_MST1 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="3" & df.mem$Duration=="T1")
+    ind_MST2 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="3" & df.mem$Duration=="T2")
+    
+    ind_CShT1 <- which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response=="3" & df.mem$Duration=="T1")
+    ind_CLT2 <- which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response=="1" & df.mem$Duration=="T2")
+    ind_FLT1 <- which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response=="1" & df.mem$Duration=="T1")
+    ind_FSaT1 <- which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response=="2" & df.mem$Duration=="T1")
+    ind_FSaT2 <- which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response=="2" & df.mem$Duration=="T2")
+    ind_FShT2 <- which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response=="3" & df.mem$Duration=="T2")
+    
+    
+    # write behaviors
+    
+      
+
+      
     # write 
     write.table(df.mem,paste0(subjDir,"Memory_data.txt"),row.names = F, quote = F, sep = '\t')
     
+      
     
     ### Behavioral counts - surely there is a better way?
+      
+      
 
-    n.TargR4_T1<-0; n.TargR12_T1<-0
-    n.TargR4_T2<-0; n.TargR12_T2<-0
-
-    n.LureR4_T1<-0; n.LureR12_T1<-0
-    n.LureR4_T2<-0; n.LureR12_T2<-0
-
-    n.Hit4_Same_T1<-0; n.Hit12_Same_T1<-0
-    n.Hit4_Same_T2<-0; n.Hit12_Same_T2<-0
-
-    n.Miss4_Long_T1<-0; n.Miss12_Long_T1<-0; n.Miss4_Short_T1<-0; n.Miss12_Short_T1<-0
-    n.Miss4_Long_T2<-0; n.Miss12_Long_T2<-0; n.Miss4_Short_T2<-0; n.Miss12_Short_T2<-0
-
-    n.CR4_Short_T1<-0; n.CR12_Short_T1<-0
-    n.CR4_Long_T2<-0; n.CR12_Long_T2<-0
-
-    n.FA4_Long_T1<-0; n.FA12_Long_T1<-0; n.FA4_Same_T1<-0; n.FA12_Same_T1<-0
-    n.FA4_Short_T2<-0; n.FA12_Short_T2<-0; n.FA4_Same_T2<-0; n.FA12_Same_T2<-0
-
-    for(i in 1:dim(df.mem)[1]){
-      if(grepl("999",df.mem[i,6])==F){
-        if(grepl("T1",df.mem[i,3])==T){
-          if(grepl("Targ",df.mem[i,2])==T && grepl("Yes",df.mem[i,4])==T){
-            if(grepl("Hit_Same",df.mem[i,7])==T){
-              if(grepl("4",df.mem[i,5])==T){
-                n.TargR4_T1<-n.TargR4_T1+1
-                n.Hit4_Same_T1<-n.Hit4_Same_T1+1
-              }else{
-                n.TargR12_T1<-n.TargR12_T1+1
-                n.Hit12_Same_T1<-n.Hit12_Same_T1+1
-              }
-            }else if(grepl("Miss_Long",df.mem[i,7])==T){
-              if(grepl("4",df.mem[i,5])==T){
-                n.TargR4_T1<-n.TargR4_T1+1
-                n.Miss4_Long_T1<-n.Miss4_Long_T1+1
-              }else{
-                n.TargR12_T1<-n.TargR12_T1+1
-                n.Miss12_Long_T1<-n.Miss12_Long_T1+1
-              }
-            }else if(grepl("Miss_Short",df.mem[i,7])==T){
-              if(grepl("4",df.mem[i,5])==T){
-                n.TargR4_T1<-n.TargR4_T1+1
-                n.Miss4_Short_T1<-n.Miss4_Short_T1+1
-              }else{
-                n.TargR12_T1<-n.TargR12_T1+1
-                n.Miss12_Short_T1<-n.Miss12_Short_T1+1
-              }
-            }
-          }else if(grepl("Lure",df.mem[i,2])==T && grepl("Yes",df.mem[i,4])==T){
-            if(grepl("CR_Short",df.mem[i,7])==T){
-              if(grepl("4",df.mem[i,5])==T){
-                n.LureR4_T1<-n.LureR4_T1+1
-                n.CR4_Short_T1<-n.CR4_Short_T1+1
-              }else{
-                n.LureR12_T1<-n.LureR12_T1+1
-                n.CR12_Short_T1<-n.CR12_Short_T1+1
-              }
-            }else if(grepl("FA_Long",df.mem[i,7])==T){
-              if(grepl("4",df.mem[i,5])==T){
-                n.LureR4_T1<-n.LureR4_T1+1
-                n.FA4_Long_T1<-n.FA4_Long_T1+1
-              }else{
-                n.LureR12_T1<-n.LureR12_T1+1
-                n.FA12_Long_T1<-n.FA12_Long_T1+1
-              }
-            }else if(grepl("FA_Same",df.mem[i,7])==T){
-              if(grepl("4",df.mem[i,5])==T){
-                n.LureR4_T1<-n.LureR4_T1+1
-                n.FA4_Same_T1<-n.FA4_Same_T1+1
-              }else{
-                n.LureR12_T1<-n.LureR12_T1+1
-                n.FA12_Same_T1<-n.FA12_Same_T1+1
-              }
-            }
-          }
-        }else{ 
-          if(grepl("Targ",df.mem[i,2])==T && grepl("Yes",df.mem[i,4])==T){
-            if(grepl("Hit_Same",df.mem[i,7])==T){
-              if(grepl("4",df.mem[i,5])==T){
-                n.TargR4_T2<-n.TargR4_T2+1
-                n.Hit4_Same_T2<-n.Hit4_Same_T2+1
-              }else{
-                n.TargR12_T2<-n.TargR12_T2+1
-                n.Hit12_Same_T2<-n.Hit12_Same_T2+1
-              }
-            }else if(grepl("Miss_Long",df.mem[i,7])==T){
-              if(grepl("4",df.mem[i,5])==T){
-                n.TargR4_T2<-n.TargR4_T2+1
-                n.Miss4_Long_T2<-n.Miss4_Long_T2+1
-              }else{
-                n.TargR12_T2<-n.TargR12_T2+1
-                n.Miss12_Long_T2<-n.Miss12_Long_T2+1
-              }
-            }else if(grepl("Miss_Short",df.mem[i,7])==T){
-              if(grepl("4",df.mem[i,5])==T){
-                n.TargR4_T2<-n.TargR4_T2+1
-                n.Miss4_Short_T2<-n.Miss4_Short_T2+1
-              }else{
-                n.TargR12_T2<-n.TargR12_T2+1
-                n.Miss12_Short_T2<-n.Miss12_Short_T2+1
-              }
-            }
-          }else if(grepl("Lure",df.mem[i,2])==T && grepl("Yes",df.mem[i,4])==T){
-            if(grepl("CR_Long",df.mem[i,7])==T){
-              if(grepl("4",df.mem[i,5])==T){
-                n.LureR4_T2<-n.LureR4_T2+1
-                n.CR4_Long_T2<-n.CR4_Long_T2+1
-              }else{
-                n.LureR12_T2<-n.LureR12_T2+1
-                n.CR12_Long_T2<-n.CR12_Long_T2+1
-              }
-            }else if(grepl("FA_Short",df.mem[i,7])==T){
-              if(grepl("4",df.mem[i,5])==T){
-                n.LureR4_T2<-n.LureR4_T2+1
-                n.FA4_Short_T2<-n.FA4_Short_T2+1
-              }else{
-                n.LureR12_T2<-n.LureR12_T2+1
-                n.FA12_Short_T2<-n.FA12_Short_T2+1
-              }
-            }else if(grepl("FA_Same",df.mem[i,7])==T){
-              if(grepl("4",df.mem[i,5])==T){
-                n.LureR4_T2<-n.LureR4_T2+1
-                n.FA4_Same_T2<-n.FA4_Same_T2+1
-              }else{
-                n.LureR12_T2<-n.LureR12_T2+1
-                n.FA12_Same_T2<-n.FA12_Same_T2+1
-              }
-            }
-          }
-        }
-      }
-    }
+    # n.TargR4_T1<-0; n.TargR12_T1<-0
+    # n.TargR4_T2<-0; n.TargR12_T2<-0
+    # 
+    # n.LureR4_T1<-0; n.LureR12_T1<-0
+    # n.LureR4_T2<-0; n.LureR12_T2<-0
+    # 
+    # n.Hit4_Same_T1<-0; n.Hit12_Same_T1<-0
+    # n.Hit4_Same_T2<-0; n.Hit12_Same_T2<-0
+    # 
+    # n.Miss4_Long_T1<-0; n.Miss12_Long_T1<-0; n.Miss4_Short_T1<-0; n.Miss12_Short_T1<-0
+    # n.Miss4_Long_T2<-0; n.Miss12_Long_T2<-0; n.Miss4_Short_T2<-0; n.Miss12_Short_T2<-0
+    # 
+    # n.CR4_Short_T1<-0; n.CR12_Short_T1<-0
+    # n.CR4_Long_T2<-0; n.CR12_Long_T2<-0
+    # 
+    # n.FA4_Long_T1<-0; n.FA12_Long_T1<-0; n.FA4_Same_T1<-0; n.FA12_Same_T1<-0
+    # n.FA4_Short_T2<-0; n.FA12_Short_T2<-0; n.FA4_Same_T2<-0; n.FA12_Same_T2<-0
+    # 
+    # for(i in 1:dim(df.mem)[1]){
+    #   if(grepl("999",df.mem[i,6])==F){
+    #     if(grepl("T1",df.mem[i,3])==T){
+    #       if(grepl("Targ",df.mem[i,2])==T && grepl("Yes",df.mem[i,4])==T){
+    #         if(grepl("Hit_Same",df.mem[i,7])==T){
+    #           if(grepl("4",df.mem[i,5])==T){
+    #             n.TargR4_T1<-n.TargR4_T1+1
+    #             n.Hit4_Same_T1<-n.Hit4_Same_T1+1
+    #           }else{
+    #             n.TargR12_T1<-n.TargR12_T1+1
+    #             n.Hit12_Same_T1<-n.Hit12_Same_T1+1
+    #           }
+    #         }else if(grepl("Miss_Long",df.mem[i,7])==T){
+    #           if(grepl("4",df.mem[i,5])==T){
+    #             n.TargR4_T1<-n.TargR4_T1+1
+    #             n.Miss4_Long_T1<-n.Miss4_Long_T1+1
+    #           }else{
+    #             n.TargR12_T1<-n.TargR12_T1+1
+    #             n.Miss12_Long_T1<-n.Miss12_Long_T1+1
+    #           }
+    #         }else if(grepl("Miss_Short",df.mem[i,7])==T){
+    #           if(grepl("4",df.mem[i,5])==T){
+    #             n.TargR4_T1<-n.TargR4_T1+1
+    #             n.Miss4_Short_T1<-n.Miss4_Short_T1+1
+    #           }else{
+    #             n.TargR12_T1<-n.TargR12_T1+1
+    #             n.Miss12_Short_T1<-n.Miss12_Short_T1+1
+    #           }
+    #         }
+    #       }else if(grepl("Lure",df.mem[i,2])==T && grepl("Yes",df.mem[i,4])==T){
+    #         if(grepl("CR_Short",df.mem[i,7])==T){
+    #           if(grepl("4",df.mem[i,5])==T){
+    #             n.LureR4_T1<-n.LureR4_T1+1
+    #             n.CR4_Short_T1<-n.CR4_Short_T1+1
+    #           }else{
+    #             n.LureR12_T1<-n.LureR12_T1+1
+    #             n.CR12_Short_T1<-n.CR12_Short_T1+1
+    #           }
+    #         }else if(grepl("FA_Long",df.mem[i,7])==T){
+    #           if(grepl("4",df.mem[i,5])==T){
+    #             n.LureR4_T1<-n.LureR4_T1+1
+    #             n.FA4_Long_T1<-n.FA4_Long_T1+1
+    #           }else{
+    #             n.LureR12_T1<-n.LureR12_T1+1
+    #             n.FA12_Long_T1<-n.FA12_Long_T1+1
+    #           }
+    #         }else if(grepl("FA_Same",df.mem[i,7])==T){
+    #           if(grepl("4",df.mem[i,5])==T){
+    #             n.LureR4_T1<-n.LureR4_T1+1
+    #             n.FA4_Same_T1<-n.FA4_Same_T1+1
+    #           }else{
+    #             n.LureR12_T1<-n.LureR12_T1+1
+    #             n.FA12_Same_T1<-n.FA12_Same_T1+1
+    #           }
+    #         }
+    #       }
+    #     }else{
+    #       if(grepl("Targ",df.mem[i,2])==T && grepl("Yes",df.mem[i,4])==T){
+    #         if(grepl("Hit_Same",df.mem[i,7])==T){
+    #           if(grepl("4",df.mem[i,5])==T){
+    #             n.TargR4_T2<-n.TargR4_T2+1
+    #             n.Hit4_Same_T2<-n.Hit4_Same_T2+1
+    #           }else{
+    #             n.TargR12_T2<-n.TargR12_T2+1
+    #             n.Hit12_Same_T2<-n.Hit12_Same_T2+1
+    #           }
+    #         }else if(grepl("Miss_Long",df.mem[i,7])==T){
+    #           if(grepl("4",df.mem[i,5])==T){
+    #             n.TargR4_T2<-n.TargR4_T2+1
+    #             n.Miss4_Long_T2<-n.Miss4_Long_T2+1
+    #           }else{
+    #             n.TargR12_T2<-n.TargR12_T2+1
+    #             n.Miss12_Long_T2<-n.Miss12_Long_T2+1
+    #           }
+    #         }else if(grepl("Miss_Short",df.mem[i,7])==T){
+    #           if(grepl("4",df.mem[i,5])==T){
+    #             n.TargR4_T2<-n.TargR4_T2+1
+    #             n.Miss4_Short_T2<-n.Miss4_Short_T2+1
+    #           }else{
+    #             n.TargR12_T2<-n.TargR12_T2+1
+    #             n.Miss12_Short_T2<-n.Miss12_Short_T2+1
+    #           }
+    #         }
+    #       }else if(grepl("Lure",df.mem[i,2])==T && grepl("Yes",df.mem[i,4])==T){
+    #         if(grepl("CR_Long",df.mem[i,7])==T){
+    #           if(grepl("4",df.mem[i,5])==T){
+    #             n.LureR4_T2<-n.LureR4_T2+1
+    #             n.CR4_Long_T2<-n.CR4_Long_T2+1
+    #           }else{
+    #             n.LureR12_T2<-n.LureR12_T2+1
+    #             n.CR12_Long_T2<-n.CR12_Long_T2+1
+    #           }
+    #         }else if(grepl("FA_Short",df.mem[i,7])==T){
+    #           if(grepl("4",df.mem[i,5])==T){
+    #             n.LureR4_T2<-n.LureR4_T2+1
+    #             n.FA4_Short_T2<-n.FA4_Short_T2+1
+    #           }else{
+    #             n.LureR12_T2<-n.LureR12_T2+1
+    #             n.FA12_Short_T2<-n.FA12_Short_T2+1
+    #           }
+    #         }else if(grepl("FA_Same",df.mem[i,7])==T){
+    #           if(grepl("4",df.mem[i,5])==T){
+    #             n.LureR4_T2<-n.LureR4_T2+1
+    #             n.FA4_Same_T2<-n.FA4_Same_T2+1
+    #           }else{
+    #             n.LureR12_T2<-n.LureR12_T2+1
+    #             n.FA12_Same_T2<-n.FA12_Same_T2+1
+    #           }
+    #         }
+    #       }
+    #     }
+    #   }
+    # }
+      
+      
+      
+      
+    ### For writing group-level memory bins
     master.mem <- rbind(master.mem, c(j,age,sex,n.TargR4_T1,n.TargR12_T1,n.TargR4_T2,n.TargR12_T2,n.LureR4_T1,n.LureR12_T1,n.LureR4_T2,n.LureR12_T2,n.Hit4_Same_T1,n.Hit12_Same_T1,n.Hit4_Same_T2,n.Hit12_Same_T2,n.Miss4_Long_T1,n.Miss12_Long_T1,n.Miss4_Short_T1,n.Miss12_Short_T1,n.Miss4_Long_T2,n.Miss12_Long_T2,n.Miss4_Short_T2,n.Miss12_Short_T2,n.CR4_Short_T1,n.CR12_Short_T1,n.CR4_Long_T2,n.CR12_Long_T2,n.FA4_Long_T1,n.FA12_Long_T1,n.FA4_Same_T1,n.FA12_Same_T1,n.FA4_Short_T2,n.FA12_Short_T2,n.FA4_Same_T2,n.FA12_Same_T2))
   }
   write.table(master.mem,paste0(dataDir,"Master_Memory.txt"),row.names = F, quote = F, sep = '\t')
