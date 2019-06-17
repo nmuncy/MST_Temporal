@@ -17,7 +17,7 @@ for i in sub*; do
 
 	[ $i == sub-4685 ]; test=$?
 
-	if [ -f ${i}/run-1_Test_scale+tlrc.HEAD ]; then
+	if [ -f ${i}/run-1_Test_scale+tlrc.HEAD ] && [ ! -f ${i}/Response_stats_REML+tlrc.HEAD ]; then
 		
 	    sbatch \
 	    -o ${outDir}/output_TS2_${i}.txt \
