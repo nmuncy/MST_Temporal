@@ -132,6 +132,7 @@ if(makeData == 1){
 
 
   ### Decode e/subj raw behavioral data  
+  # j <- subjList[1]
   for(j in subjList){
     
     subjDir <- paste0(workDir,j,"/")
@@ -150,12 +151,6 @@ if(makeData == 1){
       }
     }
     ind.mem <- ind.mem[-1]
-    
-    
-    
-    
-    #### To Do: Strip of training trials
-    
     
     
     
@@ -190,7 +185,25 @@ if(makeData == 1){
     
     
     
-    ### Figure out behaviors
+    ### Strip of training trials
+    # experiment lengths (294,282) are hardcoded
+    if(dim(df.mem)[1]==294){
+      df.mem <- tail(df.mem,-12)
+      row.names(df.mem) <- 1:dim(df.mem)[1]
+      df.mem[,1] <- 1:dim(df.mem)[1]
+    }
+    
+    # Check
+    stop = FALSE
+    if(dim(df.mem)[1]!=282){
+      stop = TRUE
+      stop('The number of trials was not 294 or 282')
+    }
+    if(stop){break}
+    
+    
+    
+    ### Determine behaviors
     ind_HST1 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="2" & df.mem$Duration=="T1")
     ind_HST2 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="2" & df.mem$Duration=="T2")
     ind_MLT1 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="1" & df.mem$Duration=="T1")
@@ -228,10 +241,10 @@ if(makeData == 1){
       
     # write data frame
     write.table(df.mem,paste0(subjDir,"Memory_data.txt"),row.names = F, quote = F, sep = '\t')
-    
+
       
     
-    ### Bin counts
+    ### Bin counts, for each lag
     for(i in c(4,12)){
       
       # num of behaviors
@@ -269,8 +282,10 @@ if(makeData == 1){
     
   }
   
-  colnames(master.mem) <- c("Subj","Age","Sex","n.TargR4_T1","n.TargR12_T1","n.TargR4_T2","n.TargR12_T2","n.LureR4_T1","n.LureR12_T1","n.LureR4_T2","n.LureR12_T2","n.Hit4_Same_T1","n.Hit12_Same_T1","n.Hit4_Same_T2","n.Hit12_Same_T2","n.Miss4_Long_T1","n.Miss12_Long_T1","n.Miss4_Short_T1","n.Miss12_Short_T1","n.Miss4_Long_T2","n.Miss12_Long_T2","n.Miss4_Short_T2","n.Miss12_Short_T2","n.CR4_Short_T1","n.CR12_Short_T1","n.CR4_Long_T2","n.CR12_Long_T2","n.FA4_Long_T1","n.FA12_Long_T1","n.FA4_Same_T1","n.FA12_Same_T1","n.FA4_Short_T2","n.FA12_Short_T2","n.FA4_Same_T2","n.FA12_Same_T2")
-  write.table(master.mem,paste0(dataDir,"Master_Memory.txt"),row.names = F, quote = F, sep = '\t')
+  # names correspond to order of bin_list
+  name_list <- c("Subj","Age","Sex","CR_Long_T2_L12","CR_Long_T2_L4","CR_Short_T1_L12","CR_Short_T1_L4","FA_Long_T1_L12","FA_Long_T1_L4","FA_Same_T1_L12","FA_Same_T1_L4","FA_Same_T2_L12","FA_Same_T2_L4","FA_Short_T2_L12","FA_Short_T2_L4","Hit_Same_T1_L12","Hit_Same_T1_L4","Hit_Same_T2_L12","Hit_Same_T2_L4","LureR_T1_L12","LureR_T1_L4","LureR_T2_L12","LureR_T2_L4","Miss_Long_T1_L12","Miss_Long_T1_L4","Miss_Long_T2_L12","Miss_Long_T2_L4","Miss_Short_T1_L12","Miss_Short_T1_L4","Miss_Short_T2_L12","Miss_Short_T2_L4","TargR_T1_L12","TargR_T1_L4","TargR_T2_L12","TargR_T2_L4")
+  colnames(master.mem) <- name_list
+  write.table(master.mem,paste0(dataDir,"Master_Memory_bin_counts.txt"),row.names = F, quote = F, sep = '\t')
 }
 
 
@@ -280,72 +295,72 @@ if(makeData == 1){
 #---------------------------------
 if(runStats == 1){
   
-  df.Master <- read.delim(paste0(dataDir,"Master_Memory.txt"))
+  df.Master <- read.delim(paste0(dataDir,"Master_Memory_bin_counts.txt"))
 
   ### Get d' scores
   ## d'T1 L4 (L->S)
   df.hold <- matrix(NA, nrow=dim(df.Master)[1],ncol=6)
-  df.hold[,1] <- as.numeric(df.Master$n.Hit4_Same_T1)
-  df.hold[,2] <- as.numeric(df.Master$n.Miss4_Long_T1)
-  df.hold[,3] <- as.numeric(df.Master$n.TargR4_T1)
-  df.hold[,4] <- as.numeric(df.Master$n.FA4_Long_T1)
-  df.hold[,5] <- as.numeric(df.Master$n.FA4_Same_T1)
-  df.hold[,6] <- as.numeric(df.Master$n.LureR4_T1)
+  df.hold[,1] <- as.numeric(df.Master$Hit_Same_T1_L4)
+  df.hold[,2] <- as.numeric(df.Master$Miss_Long_T1_L4)
+  df.hold[,3] <- as.numeric(df.Master$TargR_T1_L4)
+  df.hold[,4] <- as.numeric(df.Master$FA_Long_T1_L4)
+  df.hold[,5] <- as.numeric(df.Master$FA_Same_T1_L4)
+  df.hold[,6] <- as.numeric(df.Master$LureR_T1_L4)
   T1L4 <- dprime.Function(df.hold)
   
   
   ## d'T1 L12
   df.hold <- matrix(NA, nrow=dim(df.Master)[1],ncol=6)
-  df.hold[,1] <- as.numeric(df.Master$n.Hit12_Same_T1)
-  df.hold[,2] <- as.numeric(df.Master$n.Miss12_Long_T1)
-  df.hold[,3] <- as.numeric(df.Master$n.TargR12_T1)
-  df.hold[,4] <- as.numeric(df.Master$n.FA12_Long_T1)
-  df.hold[,5] <- as.numeric(df.Master$n.FA12_Same_T1)
-  df.hold[,6] <- as.numeric(df.Master$n.LureR12_T1)
+  df.hold[,1] <- as.numeric(df.Master$Hit_Same_T1_L12)
+  df.hold[,2] <- as.numeric(df.Master$Miss_Long_T1_L12)
+  df.hold[,3] <- as.numeric(df.Master$TargR_T1_L12)
+  df.hold[,4] <- as.numeric(df.Master$FA_Long_T1_L12)
+  df.hold[,5] <- as.numeric(df.Master$FA_Same_T1_L12)
+  df.hold[,6] <- as.numeric(df.Master$LureR_T1_L12)
   T1L12 <- dprime.Function(df.hold)
   
   
   ## d'T1 (L4+12)
   df.hold <- matrix(NA, nrow=dim(df.Master)[1],ncol=6)
-  df.hold[,1] <- as.numeric(df.Master$n.Hit4_Same_T1) + as.numeric(df.Master$n.Hit12_Same_T1)
-  df.hold[,2] <- as.numeric(df.Master$n.Miss4_Long_T1) + as.numeric(df.Master$n.Miss12_Long_T1)
-  df.hold[,3] <- as.numeric(df.Master$n.TargR4_T1) + as.numeric(df.Master$n.TargR12_T1)
-  df.hold[,4] <- as.numeric(df.Master$n.FA4_Long_T1) + as.numeric(df.Master$n.FA12_Long_T1)
-  df.hold[,5] <- as.numeric(df.Master$n.FA4_Same_T1) + as.numeric(df.Master$n.FA12_Same_T1)
-  df.hold[,6] <- as.numeric(df.Master$n.LureR4_T1) + as.numeric(df.Master$n.LureR12_T1)
+  df.hold[,1] <- as.numeric(df.Master$Hit_Same_T1_L4) + as.numeric(df.Master$Hit_Same_T1_L12)
+  df.hold[,2] <- as.numeric(df.Master$Miss_Long_T1_L4) + as.numeric(df.Master$Miss_Long_T1_L12)
+  df.hold[,3] <- as.numeric(df.Master$TargR_T1_L4) + as.numeric(df.Master$TargR_T1_L12)
+  df.hold[,4] <- as.numeric(df.Master$FA_Long_T1_L4) + as.numeric(df.Master$FA_Long_T1_L12)
+  df.hold[,5] <- as.numeric(df.Master$FA_Same_T1_L4) + as.numeric(df.Master$FA_Same_T1_L12)
+  df.hold[,6] <- as.numeric(df.Master$LureR_T1_L4) + as.numeric(df.Master$LureR_T1_L12)
   T1 <- dprime.Function(df.hold)
   
   
   ## d'T2 L4 (S->L)
   df.hold <- matrix(NA, nrow=dim(df.Master)[1],ncol=6)
-  df.hold[,1] <- as.numeric(df.Master$n.Hit4_Same_T2)
-  df.hold[,2] <- as.numeric(df.Master$n.Miss4_Short_T2)
-  df.hold[,3] <- as.numeric(df.Master$n.TargR4_T2)
-  df.hold[,4] <- as.numeric(df.Master$n.FA4_Short_T2)
-  df.hold[,5] <- as.numeric(df.Master$n.FA4_Same_T2)
-  df.hold[,6] <- as.numeric(df.Master$n.LureR4_T2)
+  df.hold[,1] <- as.numeric(df.Master$Hit_Same_T2_L4)
+  df.hold[,2] <- as.numeric(df.Master$Miss_Short_T2_L4)
+  df.hold[,3] <- as.numeric(df.Master$TargR_T2_L4)
+  df.hold[,4] <- as.numeric(df.Master$FA_Short_T2_L4)
+  df.hold[,5] <- as.numeric(df.Master$FA_Same_T2_L4)
+  df.hold[,6] <- as.numeric(df.Master$LureR_T2_L4)
   T2L4 <- dprime.Function(df.hold)
   
   
   ## d'T2 L12
   df.hold <- matrix(NA, nrow=dim(df.Master)[1],ncol=6)
-  df.hold[,1] <- as.numeric(df.Master$n.Hit12_Same_T2)
-  df.hold[,2] <- as.numeric(df.Master$n.Miss12_Short_T2)
-  df.hold[,3] <- as.numeric(df.Master$n.TargR12_T2)
-  df.hold[,4] <- as.numeric(df.Master$n.FA12_Short_T2)
-  df.hold[,5] <- as.numeric(df.Master$n.FA12_Same_T2)
-  df.hold[,6] <- as.numeric(df.Master$n.LureR12_T2)
+  df.hold[,1] <- as.numeric(df.Master$Hit_Same_T2_L12)
+  df.hold[,2] <- as.numeric(df.Master$Miss_Short_T2_L12)
+  df.hold[,3] <- as.numeric(df.Master$TargR_T2_L12)
+  df.hold[,4] <- as.numeric(df.Master$FA_Short_T2_L12)
+  df.hold[,5] <- as.numeric(df.Master$FA_Same_T2_L12)
+  df.hold[,6] <- as.numeric(df.Master$LureR_T2_L12)
   T2L12 <- dprime.Function(df.hold)
   
   
   ## d'T2
   df.hold <- matrix(NA, nrow=dim(df.Master)[1],ncol=6)
-  df.hold[,1] <- as.numeric(df.Master$n.Hit4_Same_T2) + as.numeric(df.Master$n.Hit12_Same_T2)
-  df.hold[,2] <- as.numeric(df.Master$n.Miss4_Short_T2) + as.numeric(df.Master$n.Miss12_Short_T2)
-  df.hold[,3] <- as.numeric(df.Master$n.TargR4_T2) + as.numeric(df.Master$n.TargR12_T2)
-  df.hold[,4] <- as.numeric(df.Master$n.FA4_Short_T2) + as.numeric(df.Master$n.FA12_Short_T2)
-  df.hold[,5] <- as.numeric(df.Master$n.FA4_Same_T2) + as.numeric(df.Master$n.FA12_Same_T2)
-  df.hold[,6] <- as.numeric(df.Master$n.LureR4_T2) + as.numeric(df.Master$n.LureR12_T2)
+  df.hold[,1] <- as.numeric(df.Master$Hit_Same_T2_L4) + as.numeric(df.Master$Hit_Same_T2_L12)
+  df.hold[,2] <- as.numeric(df.Master$Miss_Short_T2_L4) + as.numeric(df.Master$Miss_Short_T2_L12)
+  df.hold[,3] <- as.numeric(df.Master$TargR_T2_L4) + as.numeric(df.Master$TargR_T2_L12)
+  df.hold[,4] <- as.numeric(df.Master$FA_Short_T2_L4) + as.numeric(df.Master$FA_Short_T2_L12)
+  df.hold[,5] <- as.numeric(df.Master$FA_Same_T2_L4) + as.numeric(df.Master$FA_Same_T2_L12)
+  df.hold[,6] <- as.numeric(df.Master$LureR_T2_L4) + as.numeric(df.Master$LureR_T2_L12)
   T2 <- dprime.Function(df.hold)
   
   
