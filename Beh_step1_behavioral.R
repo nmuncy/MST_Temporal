@@ -4,6 +4,8 @@ library(ez)
 
 
 ##### Set up
+# Set working variables, toggles, and key bindings
+
 parDir <- '/Volumes/Yorick/Temporal/Experiment3/'
 workDir <- paste0(parDir,"Behavioral_Data/")
 dataDir <- paste0(parDir,"Analyses/behAnalysis/")
@@ -20,6 +22,10 @@ res.Short <- " 3"
 
 
 ### Functions
+# WLC converts wide dataframes to long
+# dprime calculated d-prime scores for dataframes
+# ttest performs a post-hoc t and organizes output
+
 WLC.Function <- function(aa,bb,cc,dd){
   
   num.subj <- dim(df.Master)[1]
@@ -119,20 +125,25 @@ ttest.Function <- function(a,b,sA,sB){
 
 
 ##### Step 1 Make Master dataframes
-#---------------------------------
+#
+# Read in raw data, determine behavioral responses
+# and bin counts for each behavior. 
+# Make sure to remove training session. The experiment
+# was 294 trials long with training, 282 without.
+# Write one out to each subjects directory, and keep
+# a master list of response bins for d' calcs later
+
 if(makeData == 1){
+  
+  # Prepare group-level output
+  master.mem <- matrix(NA,nrow=0,ncol=35)
   
   # Get subj list
   subjList <- read.delim(paste0(workDir,"Subj_List.txt"),header = F)
   subjList <- t(subjList)
-  
-  
-  # Prepare output
-  master.mem <- matrix(NA,nrow=0,ncol=35)
 
-
+  
   ### Decode e/subj raw behavioral data  
-  # j <- subjList[1]
   for(j in subjList){
     
     subjDir <- paste0(workDir,j,"/")
@@ -143,7 +154,7 @@ if(makeData == 1){
     age <- as.numeric(as.character(df.subj[2,2]))
     sex <- gsub(" ","",as.character(df.subj[3,2]),fixed=T)
     
-    # index memory
+    # index memory - number of trials
     ind.mem <- NA
     for(i in 1:dim(df.subj)[1]){
       if(grepl("Trial Start", as.character(df.subj[i,1]))==T){
@@ -153,12 +164,12 @@ if(makeData == 1){
     ind.mem <- ind.mem[-1]
     
     
-    
     ### Decode memory output
+    # set up
     df.mem <- as.data.frame(matrix(NA,nrow=length(ind.mem),ncol=7))
     colnames(df.mem) <- c("TrialNum","Type","Duration","Repeat","Lag","Response","Behavior")
     
-    
+    # loop through all trials
     for(i in 1:length(ind.mem)){
       
       # TrialNum, Type, Duration, Repeat, Lag
@@ -184,8 +195,7 @@ if(makeData == 1){
     }
     
     
-    
-    ### Strip of training trials
+    ### Strip off training trials
     # experiment lengths (294,282) are hardcoded
     if(dim(df.mem)[1]==294){
       df.mem <- tail(df.mem,-12)
@@ -202,47 +212,26 @@ if(makeData == 1){
     if(stop){break}
     
     
+    ### Determine and write behaviors
+    ind_HST1 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="2" & df.mem$Duration=="T1"); df.mem[ind_HST1,7] <- "Hit_Same_T1"
+    ind_HST2 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="2" & df.mem$Duration=="T2"); df.mem[ind_HST2,7] <- "Hit_Same_T2"
+    ind_MLT1 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="1" & df.mem$Duration=="T1"); df.mem[ind_MLT1,7] <- "Miss_Long_T1"
+    ind_MLT2 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="1" & df.mem$Duration=="T2"); df.mem[ind_MLT2,7] <- "Miss_Long_T2"
+    ind_MST1 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="3" & df.mem$Duration=="T1"); df.mem[ind_MST1,7] <- "Miss_Short_T1"
+    ind_MST2 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="3" & df.mem$Duration=="T2"); df.mem[ind_MST2,7] <- "Miss_Short_T2"
     
-    ### Determine behaviors
-    ind_HST1 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="2" & df.mem$Duration=="T1")
-    ind_HST2 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="2" & df.mem$Duration=="T2")
-    ind_MLT1 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="1" & df.mem$Duration=="T1")
-    ind_MLT2 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="1" & df.mem$Duration=="T2")
-    ind_MST1 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="3" & df.mem$Duration=="T1")
-    ind_MST2 <- which(df.mem$Type=="Targ" & df.mem$Repeat=="Yes" & df.mem$Response=="3" & df.mem$Duration=="T2")
+    ind_CShT1 <- which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response=="3" & df.mem$Duration=="T1"); df.mem[ind_CShT1,7] <- "CR_Short_T1"
+    ind_CLT2 <- which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response=="1" & df.mem$Duration=="T2"); df.mem[ind_CLT2,7] <- "CR_Long_T2"
+    ind_FLT1 <- which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response=="1" & df.mem$Duration=="T1"); df.mem[ind_FLT1,7] <- "FA_Long_T1"
+    ind_FSaT1 <- which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response=="2" & df.mem$Duration=="T1"); df.mem[ind_FSaT1,7] <- "FA_Same_T1"
+    ind_FSaT2 <- which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response=="2" & df.mem$Duration=="T2"); df.mem[ind_FSaT2,7] <- "FA_Same_T2"
+    ind_FShT2 <- which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response=="3" & df.mem$Duration=="T2"); df.mem[ind_FShT2,7] <- "FA_Short_T2"
     
-    ind_CShT1 <- which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response=="3" & df.mem$Duration=="T1")
-    ind_CLT2 <- which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response=="1" & df.mem$Duration=="T2")
-    ind_FLT1 <- which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response=="1" & df.mem$Duration=="T1")
-    ind_FSaT1 <- which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response=="2" & df.mem$Duration=="T1")
-    ind_FSaT2 <- which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response=="2" & df.mem$Duration=="T2")
-    ind_FShT2 <- which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response=="3" & df.mem$Duration=="T2")
+    ind_EncR <- which(df.mem$Repeat=="No"); df.mem[ind_EncR,7] <- "EncR"
     
-    ind_EncR <- which(df.mem$Repeat=="No")
-    
-    
-    # write behaviors
-    df.mem[ind_HST1,7] <- "Hit_Same_T1"
-    df.mem[ind_HST2,7] <- "Hit_Same_T2"
-    df.mem[ind_MLT1,7] <- "Miss_Long_T1"
-    df.mem[ind_MLT2,7] <- "Miss_Long_T2"
-    df.mem[ind_MST1,7] <- "Miss_Short_T1"
-    df.mem[ind_MST2,7] <- "Miss_Short_T2"
-    
-    df.mem[ind_CShT1,7] <- "CR_Short_T1"
-    df.mem[ind_CLT2,7] <- "CR_Long_T2"
-    df.mem[ind_FLT1,7] <- "FA_Long_T1"
-    df.mem[ind_FSaT1,7] <- "FA_Same_T1"
-    df.mem[ind_FSaT2,7] <- "FA_Same_T2"
-    df.mem[ind_FShT2,7] <- "FA_Short_T2"
-    
-    df.mem[ind_EncR,7] <- "EncR"
-
-      
-    # write data frame
+    # write subject data frame
     write.table(df.mem,paste0(subjDir,"Memory_data.txt"),row.names = F, quote = F, sep = '\t')
 
-      
     
     ### Bin counts, for each lag
     for(i in c(4,12)){
@@ -268,21 +257,20 @@ if(makeData == 1){
       assign(paste0("num_LureRT1_L",i),as.numeric(length(which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response!="999" & df.mem$Duration=="T1" & df.mem$Lag==i))))
       assign(paste0("num_LureRT2_L",i),as.numeric(length(which(df.mem$Type=="Lure" & df.mem$Repeat=="Yes" & df.mem$Response!="999" & df.mem$Duration=="T2" & df.mem$Lag==i))))
     }
-     
     
      
     ### For writing group-level memory bins
+    # write a line for each subject
     beh_hold <- c(j,age,sex)
-    
     bin_list <- ls(pattern="num_")
+    
     for(i in bin_list){
       beh_hold <- c(beh_hold,get(i))
     }
     master.mem <- rbind(master.mem,beh_hold)
-    
   }
   
-  # names correspond to order of bin_list
+  # colnames correspond to order of bin_list
   name_list <- c("Subj","Age","Sex","CR_Long_T2_L12","CR_Long_T2_L4","CR_Short_T1_L12","CR_Short_T1_L4","FA_Long_T1_L12","FA_Long_T1_L4","FA_Same_T1_L12","FA_Same_T1_L4","FA_Same_T2_L12","FA_Same_T2_L4","FA_Short_T2_L12","FA_Short_T2_L4","Hit_Same_T1_L12","Hit_Same_T1_L4","Hit_Same_T2_L12","Hit_Same_T2_L4","LureR_T1_L12","LureR_T1_L4","LureR_T2_L12","LureR_T2_L4","Miss_Long_T1_L12","Miss_Long_T1_L4","Miss_Long_T2_L12","Miss_Long_T2_L4","Miss_Short_T1_L12","Miss_Short_T1_L4","Miss_Short_T2_L12","Miss_Short_T2_L4","TargR_T1_L12","TargR_T1_L4","TargR_T2_L12","TargR_T2_L4")
   colnames(master.mem) <- name_list
   write.table(master.mem,paste0(dataDir,"Master_Memory_bin_counts.txt"),row.names = F, quote = F, sep = '\t')
@@ -292,7 +280,13 @@ if(makeData == 1){
 
 
 ##### Step 2 Stats
-#---------------------------------
+#
+# Compute adjusted d' scores for each lag as well
+# as collapsed across lags.
+# Test for effect of lag.
+# Test d's against zero and each other.
+# Account for potential outliers.
+
 if(runStats == 1){
   
   df.Master <- read.delim(paste0(dataDir,"Master_Memory_bin_counts.txt"))
@@ -445,9 +439,6 @@ if(runStats == 1){
   T1vT2 <- ttest.Function(as.numeric(df.outlier[,2]),as.numeric(df.outlier[,3]),"T1","T2")
   h.out <- capture.output(print(T1vT2))
   write.table(h.out,paste0(dataDir,"Stats_TTest_dprime_T1vT2_noOutlier.txt"),row.names = F, quote = F, sep = '\t')
-
-  
-  
 }
 
 
