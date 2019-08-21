@@ -65,6 +65,7 @@ for(j in subjList){
     }
   }
   
+  ## clean up
   # remove first NAs
   for(a in hold_list){
     assign(paste0("hold_",a),(get(paste0("hold_",a))[-1]))
@@ -141,17 +142,17 @@ for(j in subjList){
   # Use indices to keep trials straight
   # Make sure the beginning of each block has t=0
 
-  # get behavior variables, set nr_status opposite (T) for conditional check
+  # get behavior variables
   beh_list <- gsub("ind_beh_","",ls(pattern="ind_beh"))
   for(a in beh_list){
     
     # behavior positions (index)
     ind_a <- get(paste0("ind_beh_",a))
     
-    # set NR/Foil status for encoding trials
-    nr_status = TRUE
+    # set model_status to avoid NR/Foils
+    model_status = TRUE
     if(a == "NR_All" | a == "Foil_All"){
-      nr_status = FALSE
+      model_status = FALSE
     }
 
     # separate by block
@@ -169,7 +170,7 @@ for(j in subjList){
         
       # set output (which line of TF to write), for encoding (Response preceding) and behavior trials. No NRs.
       hold_block <- paste0("TF_line",block,"_",a); assign(hold_block,NA); 
-      if(nr_status){
+      if(model_status){
         hold_block_precede <- paste0("TF_line",block,"_Rp",a)
         assign(hold_block_precede,NA)
       }
@@ -193,7 +194,7 @@ for(j in subjList){
           # determine start, duration of behavior (dur = start to decision, not entire available response time)
           # account for NR response issues
           hold_start <- round((hold_resp_onset[b]-time_zero),1)
-          if(nr_status){
+          if(model_status){
             hold_dur <- round(((hold_resp_time[b]-time_zero)-hold_start),1)
           }else{
             hold_dur <- round(((hold_trial_end[b]-time_zero)-hold_start),1)
@@ -202,10 +203,11 @@ for(j in subjList){
           assign(hold_block,c(get(hold_block),TF_input))
           
           # Determine start, duration of encoding (Response preceding behavior). No NRs
-          if(nr_status){
+          # Model stimulus presentation, not response, of 1st presentation for encoding
+          if(model_status){
             total_trial_num <- trial_num+LB-1
-            hold_start_enc <- round((hold_resp_onset[total_trial_num]-time_zero),1)
-            hold_dur_enc <- round(((hold_resp_time[total_trial_num]-time_zero)-hold_start_enc),1)
+            hold_start_enc <- round((hold_stim_onset[total_trial_num]-time_zero),1)
+            hold_dur_enc <- round(((hold_stat_onset[total_trial_num]-time_zero)-hold_start_enc),1)
             TF_input_enc <- paste0(hold_start_enc,":",hold_dur_enc)
             assign(hold_block_precede,c(get(hold_block_precede),TF_input_enc))
           }
@@ -215,7 +217,7 @@ for(j in subjList){
       # remove NAs. No NRs for encoding
       assign(hold_block,get(hold_block)[-1])
       
-      if(nr_status){
+      if(model_status){
         assign(hold_block_precede,get(hold_block_precede)[-1])
       }
     }
@@ -228,7 +230,7 @@ for(j in subjList){
         assign(paste0("TF_line",e,"_",a),"*")
       }
 
-      if(nr_status){
+      if(model_status){
         hold_tf_enc <- get(paste0("TF_line",e,"_Rp",a))      
         if(length(hold_tf_enc)==0){
           assign(paste0("TF_line",e,"_Rp",a),"*")
