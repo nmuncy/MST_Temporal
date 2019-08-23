@@ -147,7 +147,7 @@ for i in ${!compList[@]}; do
 
 	for j in All Body Head; do
 
-		print=Betas_${pref}_${j}_sub.txt
+		print=${betaDir}/Betas_${pref}_${j}_sub.txt
 		> $print
 
 		for k in {L,R}_{CA1,Sub,Multi}; do

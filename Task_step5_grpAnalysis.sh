@@ -19,60 +19,6 @@ export OMP_NUM_THREADS=$SLURM_CPUS_ON_NODE
 
 
 
-# Written by Nathan Muncy on 11/2/18
-
-
-###--- Notes, in no particular order
-#
-# 1) does the new ETAC multiple comparison method
-#
-# 2) constructs a gray matter intersection mask
-#		depends on ACT priors
-#
-# 3) accepts multiple blurs and p-values (multiple should be used)
-#
-# 4) generates subj lists for 3dttest++, excluding subjects who moved too much (ref step3)
-#
-# 5) each etac run takes about 5 hours, so do 5*$etacLen for walltime
-#
-# 7) Notice the number of processors - I recommend updating OMP_NUM_THREADS in .afnirc
-#		ETAC has heavy memory and processor needs
-
-
-### update by Nathan Muncy on 11/30/18
-#
-# 8) Updated to support multiple pairwise comparisons
-#		- if arrays A-C exist, will do an ETAC for AvB, AvC, BvC.
-#		- will keep things straight with compList, so if you have the following:
-#
-#			compList=(first second third)
-#			arrA=(1 2 3)
-#			arrB=(11 22 33)
-#			arrC=(111 222 333)
-#			wsArr=ABC
-#
-#			then for the "first" comparison, you would get 1v11, 1v111, and 11v111
-#			and for the "second" comparison, you would get 2v22, 2v222, and 22v222, etc.
-#
-# 9) Will now write out the grpAnalysis scripts to $outDir for your review.
-#
-# 10) added notes to each section
-#
-# 11) Added a section that will run MVMs via the ACF multiple comparison method.
-#
-#			compList=(first second third)
-#			arrA=(1 2 3)
-#			arrB=(11 22 33)
-#			arrC=(111 222 333)
-#			wsArr=ABC
-#			bsArr=(Con Aut)
-#
-#			then for the "third" comparison, you would get 2(Con, Aut) x 3(3,33,333) comparison
-
-
-
-
-
 
 
 ### --- Set up --- ###										###??? update variables/arrays
@@ -95,7 +41,6 @@ mask=Intersection_GM_mask+tlrc								# this will be made, just specify name for
 
 
 # grpAnalysis
-doETAC=0													# Toggle ETAC analysis (1)
 doMVM=1														# MVM (1)
 runIt=1														# whether ETAC/MVM scripts actually run (and not just written) (1)
 
@@ -115,15 +60,9 @@ namB=(FA FA)
 namC=(Hit Hit)
 namD=(Miss Miss)
 
-# ETAC arrs
-blurX=({1..4})    											# blur multipliers (integer)
-pval_list=(0.01 0.005 0.001)								# p-value thresholds
-
 
 # MVM vars/arrs
 blurM=2														# blur multiplier, float/int
-# bsArr=(OCD Con)												# Bx-subject variables (groups)
-# bsList=${outDir}/Group_list.txt								# Needed when bsArr > 1. List where col1 = subj identifier, col2 = group membership (e.g. s1295 Con)
 
 
 
@@ -268,163 +207,6 @@ if [ $runIt == 1 ]; then
 	if [ ! -f vold2_mni_brain+tlrc.HEAD ]; then
 		cp ${tempDir}/vold2_mni_brain+tlrc* .
 	fi
-fi
-
-
-
-### --- ETAC --- ###
-#
-# This section will generate needed arguments for ETAC, including
-# the p-values, blur sizes, and z-scores. It will then create a
-# subject list which will exclude participants who were excessively
-# noisy. An ETAC script will then be written, ran, and then the
-# output will be combined across blurs and p-values to yield
-# FINALall_something files. The extract sig clusters and stitching
-# may have a better solution.
-#
-# Currently, this will only do paired comparisons e.g. BehA vs BehB,
-# but multiple t-tests are supported (AvB, AvC, BvC). Will produce
-# masks for each blur, collapsing across blurs.
-
-
-if [ $doETAC == 1 ]; then
-
-	# generate z,plist
-	c=0; for i in ${pval_list[@]}; do
-
-		zval_list[$c]=`ccalc "qginv(${pval_list[$c]})"`
-		pval_hold+="${pval_list[$c]},"
-		let c=$[$c+1]
-	done
-
-	pval_all=${pval_hold%?}
-
-
-	# gen $blur
-	gridSize=`3dinfo -dk $refFile`
-	int=`printf "%.0f" $gridSize`
-
-	unset blur
-	c=0; for i in ${blurX[@]}; do
-		hold="$(($int * $i))"
-		blur+="$hold "
-		blurArr[$c]=$hold
-		let c=$[$c+1]
-	done
-
-
-	# do ETAC for e/permutation of sub-briks, for each $compList
-	c=0; while [ $c -lt $compLen ]; do
-
-		# variables
-		pref=${compList[$c]}
-		scan=${pref}_stats_REML+tlrc
-		outPre=${pref}_ETAC_REML
-
-		for a in ${arr[@]}; do
-
-			# unpack sub-brik value/name for e/permutation set
-			eval declare -a var1=(arr${a:0:1})
-			eval declare -a var2=(arr${a:1:1})
-			eval declare -a nam1=(nam${a:0:1})
-			eval declare -a nam2=(nam${a:1:1})
-
-			brik1=$(eval echo \${${var1}[$c]})
-			brik2=$(eval echo \${${var2}[$c]})
-			name1=$(eval echo \${${nam1}[$c]})
-			name2=$(eval echo \${${nam2}[$c]})
-
-			out=${outPre}_${name1}-${name2}
-
-
-			# construct setA and setB of subjects not found in info_rmSubj.txt
-			arrRem=(`cat ${outDir}/info_rmSubj_${pref}.txt`)
-			unset ListA
-			unset ListB
-
-		    for i in ${workDir}/s*; do
-
-				subj=${i##*\/}
-				MatchString "$subj" "${arrRem[@]}"
-
-				if [ $? == 1 ]; then
-					ListA+="$subj ${i}/${scan}[${brik1}] "
-					ListB+="$subj ${i}/${scan}[${brik2}] "
-				fi
-			done
-
-
-			# write script
-			echo "3dttest++ \\
-				-paired \\
-				-mask $mask \\
-				-prefix $out \\
-				-prefix_clustsim ${out}_clustsim \\
-				-ETAC \\
-				-ETAC_blur $blur \\
-				-ETAC_opt name=NN1:NN1:2sid:pthr=$pval_all \\
-				-setA A $ListA \\
-				-setB B $ListB" > ${outDir}/${out}.sh
-
-
-			# Do ETAC
-			if [ $runIt == 1 ]; then
-				if [ ! -f ${out}_clustsim.NN1.ETACmask.global.2sid.5perc.nii.gz ] && [ ! -f FINALall_${out}+tlrc.HEAD ]; then
-
-					source ${outDir}/${out}.sh
-
-					# check output
-					if [ ! -f ${out}_clustsim.NN1.ETACmask.global.2sid.5perc.nii.gz ] && [ ! -f etac_extra/${out}_clustsim.NN1.ETACmask.global.2sid.5perc.nii.gz ]; then
-						echo >&2
-						echo "ETAC failed on $out. Exiting. Exit 7" >&2
-						echo >&2
-						exit 7
-					fi
-				fi
-
-
-			    # pull final output
-			    if [ ! -f FINALall_${out}+tlrc.HEAD ]; then
-
-					3dcopy ${out}_clustsim.NN1.ETACmask.global.2sid.5perc.nii.gz FINALall_${out}+tlrc
-
-					numBlur=${#blurArr[@]}
-					numPval=${#pval_list[@]}
-
-					blurC=0; pvalC=0
-					while [ $blurC -lt $numBlur ]; do
-
-						unset hBrick
-						for ((j=1; j<=$numPval; j++)); do
-							hBrick+="$pvalC,"
-							let pvalC=$[$pvalC+1]
-						done
-						hBrick=${hBrick%?}
-
-						3dbucket -prefix FINAL_b${blurArr[$blurC]}_${out} ${out}_clustsim.NN1.ETACmaskALL.global.2sid.5perc.nii.gz[$hBrick]
-						3dmask_tool -input FINAL_b${blurArr[$blurC]}_${out}+tlrc -union -prefix FINAL_b${blurArr[$blurC]}_allP_${out}
-
-						let blurC=$[$blurC+1]
-					done
-				fi
-		    fi
-		done
-
-		let c=$[$c+1]
-	done
-
-
-	# clean up
-	mkdir etac_{extra,scripts,indiv}
-	mv *.sh etac_scripts
-	mv FINAL_b* etac_indiv
-	mv Group* etac_extra
-	mv Prior* etac_extra
-	mv global* etac_extra
-
-	for i in ${compList[@]}; do
-		mv ${i}* etac_extra
-	done
 fi
 
 
