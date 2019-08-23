@@ -143,28 +143,31 @@ for i in ${!compList[@]}; do
 	pref=${compList[$i]}
 	scan=${pref}_stats_REML+tlrc
 	betas=${arrA[$i]},${arrB[$i]},${arrC[$i]},${arrD[$i]}
-
 	arrRem=(`cat ${grpDir}/info_rmSubj_${pref}.txt`)
-	print=${betaDir}/Betas_${pref}_sub_data.txt
-	> $print
 
-	for k in Mask*.HEAD; do
+	for j in All Body Head; do
 
-		hold=${k#*_}
-		echo "Mask ${hold%+*}" >> $print
+		print=Betas_${pref}_${j}_sub.txt
+		> $print
 
-		for j in ${workDir}/s*; do
+		for k in {L,R}_{CA1,Sub,Multi}; do
 
-			subj=${j##*\/}
-			MatchString $subj "${arrRem[@]}"
+			mask=Mask_${j}_${k}+tlrc
+			echo "Mask ${mask%+*}" >> $print
 
-			if [ $? == 1 ]; then
-				stats=`3dROIstats -mask ${k%.*} "${j}/${scan}[${betas}]"`
-				echo "$subj $stats" >> $print
-			fi
+			for m in ${workDir}/s*; do
+
+				subj=${m##*\/}
+				MatchString $subj "${arrRem[@]}"
+
+				if [ $? == 1 ]; then
+					stats=`3dROIstats -mask $mask "${m}/${scan}[${betas}]"`
+					echo "$subj $stats" >> $print
+				fi
+			done
+
+			echo >> $print
 		done
-
-		echo >> $print
 	done
 done
 
