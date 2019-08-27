@@ -36,7 +36,7 @@ refFile=${workDir}/sub-3408/Encoding_stats_REML+tlrc		# reference file, for find
 
 
 tempDir=~/bin/Templates/vold2_mni							# desired template
-svLabels=(0017 0053 1006 2006)
+svLabels=(0017 0053 1006 2006 1016 2016)
 smallMask=Intersection_GM_MTL_mask+tlrc
 svPrior=${tempDir}/priors_JLF
 
