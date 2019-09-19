@@ -35,7 +35,7 @@ rawDir=${parDir}/rawdata
 taskName=Temporal								# name of task (ref Task_step0)
 duration=										# duration of trial (ref Task_step2). Leave empty of duration varies (e.g. 1:1.3 5:0.8)
 suffix=txt		   								# suffix of timing file (1D or txt)
-TimingNames=(CR Hit LureFA LureCR Other) 		# behaviors corresponding to 1D timing files (ref Task_step2 NotLazy section)
+TimingNames=()							 		# behaviors corresponding to 1D timing files (ref Task_step2 NotLazy section)
 
 
 
