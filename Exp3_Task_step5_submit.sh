@@ -15,4 +15,4 @@ mkdir -p $outDir
 sbatch \
 -o ${outDir}/output_TS5.txt \
 -e ${outDir}/error_TS5.txt \
-Task_step5_grpAnalysis.sh
+Exp3_Task_step5_grpAnalysis.sh

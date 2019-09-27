@@ -15,5 +15,5 @@ mkdir -p $outDir
 sbatch \
 -o ${outDir}/output_TS4.txt \
 -e ${outDir}/error_TS4.txt \
-${scriptDir}/Task_step4_HipSeg_betas.sh
+${scriptDir}/Exp3_Task_step4_HipSeg_betas.sh
 

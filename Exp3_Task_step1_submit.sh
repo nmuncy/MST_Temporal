@@ -23,7 +23,7 @@ for i in sub*; do
 	    sbatch \
 	    -o ${outDir}/output_TS1_${i}.txt \
 	    -e ${outDir}/error_TS1_${i}.txt \
-	    ${scriptDir}/Task_step1_sbatch_preproc.sh $i
+	    ${scriptDir}/Exp3_Task_step1_sbatch_preproc.sh $i
 
 	    sleep 1
 	fi

@@ -15,4 +15,4 @@ mkdir -p $outDir
 sbatch \
 -o ${outDir}/output_TS6.txt \
 -e ${outDir}/error_TS6.txt \
-Task_step6_grpAnalysis_smallVol.sh
+Exp3_Task_step6_grpAnalysis_smallVol.sh

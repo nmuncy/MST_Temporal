@@ -15,4 +15,4 @@ mkdir -p $outDir
 sbatch \
 -o ${outDir}/output_TS7.txt \
 -e ${outDir}/error_TS7.txt \
-Task_step7_meanBetas.sh
+Exp3_Task_step7_meanBetas.sh
