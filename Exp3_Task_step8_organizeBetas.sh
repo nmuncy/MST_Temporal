@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-parDir=/Volumes/Yorick/Temporal/Experiment3/Analyses/grpAnalysis
+parDir=/Volumes/Yorick/Temporal/Analyses/Exp3/grpAnalysis
 workDir=${parDir}/mvm_betas
 statsDir=${parDir}/mvm_stats
 mkdir $statsDir

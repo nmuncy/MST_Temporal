@@ -6,9 +6,9 @@ library(ez)
 ##### Set up
 # Set working variables, toggles, and key bindings
 
-parDir <- '/Volumes/Yorick/Temporal/Experiment3/'
-workDir <- paste0(parDir,"Behavioral_Data/")
-dataDir <- paste0(parDir,"Analyses/behAnalysis/")
+parDir <- '/Volumes/Yorick/Temporal/'
+workDir <- paste0(parDir,"Experiment3/Behavioral_Data/")
+dataDir <- paste0(parDir,"Analyses/Exp3/behAnalysis/")
 
 # Toggles
 makeData <- 1

@@ -23,10 +23,10 @@ module load r/3.6
 
 
 ###??? update these
-parDir=~/compute/Temporal/Experiment3
-workDir=${parDir}/derivatives
-grpDir=${parDir}/Analyses/grpAnalysis
-refDir=${workDir}/sub-4685
+parDir=~/compute/Temporal
+workDir=${parDir}/Experiment3/derivatives
+grpDir=${parDir}/Analyses/Exp3/grpAnalysis
+refDir=${workDir}/Experiment3/sub-4685
 maxP=0.1								# max percentage of censored TRs allowed (0.1 = 10%)
 
 mkdir -p $grpDir

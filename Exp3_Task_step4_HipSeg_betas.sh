@@ -42,11 +42,11 @@ export OMP_NUM_THREADS=$SLURM_CPUS_ON_NODE
 
 
 # general vars											###??? Update these
-parDir=~/compute/Temporal/Experiment3
-workDir=${parDir}/derivatives
-roiDir=${parDir}/Analyses/roiAnalysis
+parDir=~/compute/Temporal
+workDir=${parDir}/Experiment3/derivatives
+roiDir=${parDir}/Analyses/Exp3/roiAnalysis
 betaDir=${roiDir}/sub_betas
-grpDir=${parDir}/Analyses/grpAnalysis
+grpDir=${parDir}/Analyses/Exp3/grpAnalysis
 
 tempDir=~/bin/Templates/vold2_mni
 priorDir=${tempDir}/priors_HipSeg

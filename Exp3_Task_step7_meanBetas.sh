@@ -20,8 +20,8 @@ export OMP_NUM_THREADS=$SLURM_CPUS_ON_NODE
 
 
 ### Set up
-workDir=~/compute/Temporal/Experiment3
-grpDir=${workDir}/Analyses/grpAnalysis
+workDir=~/compute/Temporal
+grpDir=${workDir}/Analyses/Exp3/grpAnalysis
 maskDir=${grpDir}/mvm_masks
 betaDir=${grpDir}/mvm_betas
 
@@ -64,7 +64,7 @@ c=0; while [ $c -lt ${#maskArr[@]} ]; do
 			3dcopy ${mask}_c${j}.nii.gz ${mask}_c${j}+tlrc
 		fi
 	done
-	
+
 
 	### extract betas from each cluster
 	arrRem=(`cat ${grpDir}/info_rmSubj_${scanArr[$c]}.txt`)
@@ -73,7 +73,7 @@ c=0; while [ $c -lt ${#maskArr[@]} ]; do
 	> $print
 
 	for i in ${mask}_c*.HEAD; do
-		for j in ${workDir}/derivatives/s*; do
+		for j in ${workDir}/Experiment3/derivatives/s*; do
 
 			cluster=${i%.*}
 			subj=${j##*\/}

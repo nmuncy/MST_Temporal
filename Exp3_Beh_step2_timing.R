@@ -6,9 +6,9 @@
 # data and output dir.
 # References output made by Beh_step0_mkList.sh
 
-parDir <- '/Volumes/Yorick/Temporal/Experiment3/'
-workDir <- paste0(parDir,"Behavioral_Data/")
-outDir <- paste0(parDir,"Analyses/behAnalysis/timing_files/")
+parDir <- '/Volumes/Yorick/Temporal/'
+workDir <- paste0(parDir,"Experiment3/Behavioral_Data/")
+outDir <- paste0(parDir,"Analyses/Exp3/behAnalysis/timing_files/")
 
 subjList <- read.delim(paste0(workDir,"Subj_List.txt"),header = F)
 subjList <- t(subjList)

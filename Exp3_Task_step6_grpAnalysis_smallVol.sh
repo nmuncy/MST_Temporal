@@ -29,10 +29,10 @@ export OMP_NUM_THREADS=$SLURM_CPUS_ON_NODE
 
 
 # General variables
-parDir=~/compute/Temporal/Experiment3
-workDir=${parDir}/derivatives								# par dir of data
-outDir=${parDir}/Analyses/grpAnalysis						# where output will be written (should match step3)
-refFile=${workDir}/sub-3408/Encoding_stats_REML+tlrc		# reference file, for finding dimensions etc
+parDir=~/compute/Temporal
+workDir=${parDir}/Experiment3/derivatives					# par dir of data
+outDir=${parDir}/Analyses/Exp3/grpAnalysis					# where output will be written (should match step3)
+refFile=${workDir}/Experiment3/sub-3408/Encoding_stats_REML+tlrc		# reference file, for finding dimensions etc
 
 
 tempDir=~/bin/Templates/vold2_mni							# desired template
@@ -96,7 +96,7 @@ arrCount=0; while [ $arrCount -lt $compLen ]; do
 	outPre=${pref}_MVM_REML_sv
 	print=ACF_raw_${pref}_sv.txt
 	> $print
-	
+
 	# make subj list
 	unset subjList
 
