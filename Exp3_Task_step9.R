@@ -14,21 +14,23 @@ library(ez)
 # Set up
 ###################
 
-parDir <- "/Volumes/Yorick/Temporal/Experiment3/Analyses/"
+parDir <- "/Volumes/Yorick/Temporal/"
+expDir <- paste0(parDir,"Analyses/Exp3/")
+graphDir <- paste0(parDir,"write/figures/")
 
 doWrite <- 1
 doGraphs <- 1
 
 
 ### ROI variables
-roiDir <- paste0(parDir,"roiAnalysis/")
+roiDir <- paste0(expDir,"roiAnalysis/")
 subDir <- paste0(roiDir,"sub_betas/")
 hc_outDir <- paste0(roiDir,"sub_stats/")
 
 
 
 ### MVM variables
-mvmDir <- paste0(parDir,"grpAnalysis/")
+mvmDir <- paste0(expDir,"grpAnalysis/")
 mvmData_location <- paste0(mvmDir,"mvm_betas/")
 mvmData_list <- read.table(paste0(mvmData_location,"All_List.txt"))
 mvm_outDir <- mvmData_location
@@ -58,7 +60,7 @@ GraphMvmNames.Function <- function(dataString1,dataString2){
       return(list(n1="RpCR", n2="RpFA"))
     }
   }else if(dataString1=="Response"){
-    if(dataString2=="rErc"){
+    if(dataString2=="lErc"){
       return(list(n1="CR", n2="Hit"))
     }
   }
@@ -77,8 +79,8 @@ MvmNames.Function <- function(x,y){
       return("R. Hippocampus")
     }
   }else if(grepl("Response",x)==T){
-    if(y=="rErc"){
-      return("R. Entorhinal Cortex")
+    if(y=="lErc"){
+      return("L. Entorhinal Cortex")
     }
   }
 }
@@ -111,7 +113,7 @@ Graph.Function <- function(DF,output_name,maskN,out_place){
   plotable[2,] <- E.BARS
   
   if(doWrite == 1){
-    graphOut <- paste0(out_place,"Graph_",output_name,"_",TITLE,".tiff")
+    graphOut <- paste0(graphDir,"Exp3_Plot_",output_name,"_",TITLE,".tiff")
     bitmap(graphOut, width = 6.5, units = 'in', type="tiff24nc", res=1200)
   }
   barCenters <- barplot(plotable[1,], names.arg = c(XNAMES), main=ROI, ylab="Beta Coefficient",ylim=RANGE)

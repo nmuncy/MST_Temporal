@@ -10,7 +10,7 @@ mkdir $statsDir
 compList=(Encoding Response)
 
 arrEncoding=(rHip lErc)
-arrResponse=(rErc)
+arrResponse=(lErc)
 
 
 cd $workDir
