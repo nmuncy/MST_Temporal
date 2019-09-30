@@ -518,7 +518,7 @@ if(makeGraphs == 1){
   df.graph[,1] <- df.dprime[,2]
   df.graph[,2] <- df.dprime[,3]
 
-  tiff(paste0(outDir,"Fig_T1vT2_dprime.tiff"), height = 5.5, width = 5.5, units = 'in', res=300)
+  tiff(paste0(outDir,"Exp2_Fig_T1vT2_dprime.tiff"), height = 5.5, width = 5.5, units = 'in', res=300)
   par(family="Times New Roman")
   hold.graph <- boxplot(df.graph, ylim=c(-1,3), ylab="d' scores", col="white", cex.lab=1.5, cex.axis=1)
   title(main=list("Sensitivity to Duration", cex=1.5))
