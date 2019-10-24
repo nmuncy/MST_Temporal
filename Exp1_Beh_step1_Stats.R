@@ -601,66 +601,66 @@ if(makeGraphs == 1){
   dev.off()
 
 
-  ### T1vT2 (T1 = L->S)
-  df.graph <- matrix(NA,nrow=dim(df.dprime)[1],ncol=4)
-  colnames(df.graph) <- c("Lag 4 L -> S","Lag 12 L -> S","Lag 4 S -> L","Lag 12 S -> L")
-  df.graph[,1] <- df.dprime[,4]
-  df.graph[,2] <- df.dprime[,5]
-  df.graph[,3] <- df.dprime[,6]
-  df.graph[,4] <- df.dprime[,7]
-
-  tiff(paste0(outDir,"Exp1_Plot_LagXDur_dprime.tiff"), height = 7, width = 7, units = 'in', res=300)
-  par(family="Times New Roman")
-  hold.graph <- boxplot(df.graph, ylim=c(-1,3), ylab="d' scores", col="white", cex.lab=1.5, cex.axis=1)
-  title(main=list("Sensitivity to Duration, per lag", cex=1.5))
-  abline(h = 0)
-  dev.off()
+  # ### T1vT2 (T1 = L->S)
+  # df.graph <- matrix(NA,nrow=dim(df.dprime)[1],ncol=4)
+  # colnames(df.graph) <- c("Lag 4 L -> S","Lag 12 L -> S","Lag 4 S -> L","Lag 12 S -> L")
+  # df.graph[,1] <- df.dprime[,4]
+  # df.graph[,2] <- df.dprime[,5]
+  # df.graph[,3] <- df.dprime[,6]
+  # df.graph[,4] <- df.dprime[,7]
+  # 
+  # tiff(paste0(outDir,"Exp1_Plot_LagXDur_dprime.tiff"), height = 7, width = 7, units = 'in', res=300)
+  # par(family="Times New Roman")
+  # hold.graph <- boxplot(df.graph, ylim=c(-1,3), ylab="d' scores", col="white", cex.lab=1.5, cex.axis=1)
+  # title(main=list("Sensitivity to Duration, per lag", cex=1.5))
+  # abline(h = 0)
+  # dev.off()
   
   
   
-  ### plotting the SNR curve (based on Ari code)
-  
-  # parameters
-  par(mar=c(0.1,0.1,0.1,0.1))
-  d1 <- dnorm(seq(-5,5,0.01),sd=0.5)
-  d2 <- dnorm(seq(-5,5,0.01),mean=1.2,sd=0.5)
-  
-  alpha = 0.7
-  col1 <- "DarkBlue"
-  col2 <- "DarkRed"
-  
-  cord.x1 <- c(alpha,seq(alpha,5,0.01),5) 
-  cord.y1 <- c(0,dnorm(seq(alpha,5,0.01),sd=0.5),0) 
-  cord.x2 <- c(-4,seq(-4,alpha,0.01),alpha) 
-  cord.y2 <- c(0,dnorm(seq(-4,alpha,0.01),mean=1.2,sd=0.5),0) 
-  
-  # plot
-  tiff(paste0(outDir,"Fig_dprime_calc.tiff"), height = 7, width = 7, units = 'in', res=300)
-  par(family="Times New Roman")
-  plot(seq(-5,5,0.01),d1,type='l',ylab="",xlab="",xlim=c(-2,3),axes=F,lwd=3,col=col1,ylim=c(0,1))
-  title(expression("d'"[" L->S"] ~ "= z(pHit) - z(pFA)"),adj=0,cex.main=1.5)
-  lines(seq(-5,5,0.01),d2,lwd=3,col=col2)
-  abline(h=0)
-
-  # text
-  text(0,0.9,"T=1",cex=1.5,col=col1); text(0,0.85,"Lure",cex=1.2,col=col1)
-  text(1.2,0.9,"T=1.5",cex=1.5,col=col2); text(1.2,0.85,"Target",cex=1.2,col=col2)
-  
-  # beh
-  segments(0,0.5,-0.7,0.5,col=col1); text(-1.1,0.5,"CR-Shorter",col=col1)
-  segments(1.2,0.5,1.9,0.5,col=col2); text(2.2,0.5,"Hit-Same",col=col2)
-  segments(1.8,0.25,2.2,0.25,col=col2); text(2.6,0.25,"Miss-Longer",col=col2)
-  segments(0.5,0.1,0,0.1,col=col2); text(-0.4,0.1,"Miss-Shorter",col=col2)
-  segments(0.6,0.25,1,0.25,col=col1); text(1.3,0.25,"FA-Same",col=col1)
-  segments(0.9,0.1,1.3,0.1,col=col1); text(1.65,0.1,"FA-Longer",col=col1)
-  
-  # formula
-  text(-1.37,1,"pHit = Hit-Same + Miss-Longer",cex=0.8)
-  segments(-1.8,0.98,-0.7,0.98)
-  text(-1.3,0.95,"Targets",cex=0.8)
-  text(-1.4,0.9,"pFA = FA-Longer + FA-Same",cex=0.8)
-  segments(-1.8,0.88,-0.7,0.88)
-  text(-1.3,0.85,"Targets",cex=0.8)
-  
-  dev.off()
+  # ### plotting the SNR curve (based on Ari code)
+  # 
+  # # parameters
+  # par(mar=c(0.1,0.1,0.1,0.1))
+  # d1 <- dnorm(seq(-5,5,0.01),sd=0.5)
+  # d2 <- dnorm(seq(-5,5,0.01),mean=1.2,sd=0.5)
+  # 
+  # alpha = 0.7
+  # col1 <- "DarkBlue"
+  # col2 <- "DarkRed"
+  # 
+  # cord.x1 <- c(alpha,seq(alpha,5,0.01),5) 
+  # cord.y1 <- c(0,dnorm(seq(alpha,5,0.01),sd=0.5),0) 
+  # cord.x2 <- c(-4,seq(-4,alpha,0.01),alpha) 
+  # cord.y2 <- c(0,dnorm(seq(-4,alpha,0.01),mean=1.2,sd=0.5),0) 
+  # 
+  # # plot
+  # tiff(paste0(outDir,"Fig_dprime_calc.tiff"), height = 7, width = 7, units = 'in', res=300)
+  # par(family="Times New Roman")
+  # plot(seq(-5,5,0.01),d1,type='l',ylab="",xlab="",xlim=c(-2,3),axes=F,lwd=3,col=col1,ylim=c(0,1))
+  # title(expression("d'"[" L->S"] ~ "= z(pHit) - z(pFA)"),adj=0,cex.main=1.5)
+  # lines(seq(-5,5,0.01),d2,lwd=3,col=col2)
+  # abline(h=0)
+  # 
+  # # text
+  # text(0,0.9,"T=1",cex=1.5,col=col1); text(0,0.85,"Lure",cex=1.2,col=col1)
+  # text(1.2,0.9,"T=1.5",cex=1.5,col=col2); text(1.2,0.85,"Target",cex=1.2,col=col2)
+  # 
+  # # beh
+  # segments(0,0.5,-0.7,0.5,col=col1); text(-1.1,0.5,"CR-Shorter",col=col1)
+  # segments(1.2,0.5,1.9,0.5,col=col2); text(2.2,0.5,"Hit-Same",col=col2)
+  # segments(1.8,0.25,2.2,0.25,col=col2); text(2.6,0.25,"Miss-Longer",col=col2)
+  # segments(0.5,0.1,0,0.1,col=col2); text(-0.4,0.1,"Miss-Shorter",col=col2)
+  # segments(0.6,0.25,1,0.25,col=col1); text(1.3,0.25,"FA-Same",col=col1)
+  # segments(0.9,0.1,1.3,0.1,col=col1); text(1.65,0.1,"FA-Longer",col=col1)
+  # 
+  # # formula
+  # text(-1.37,1,"pHit = Hit-Same + Miss-Longer",cex=0.8)
+  # segments(-1.8,0.98,-0.7,0.98)
+  # text(-1.3,0.95,"Targets",cex=0.8)
+  # text(-1.4,0.9,"pFA = FA-Longer + FA-Same",cex=0.8)
+  # segments(-1.8,0.88,-0.7,0.88)
+  # text(-1.3,0.85,"Targets",cex=0.8)
+  # 
+  # dev.off()
 }

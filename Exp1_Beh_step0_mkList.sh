@@ -2,7 +2,7 @@
 
 
 
-workDir=/Volumes/Yorick/Temporal
+workDir=/Volumes/Yorick/Temporal/Experiment1
 cd $workDir
 
 
