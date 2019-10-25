@@ -443,6 +443,25 @@ if(runStats == 1){
   
   
   
+  
+  ## Correct for multiple comparisons on T-tests - FDR. No/outliers separately
+  # outliers
+  p.T1v0 <- T1vT2[[4]]$p.value
+  p.T2v0 <- T1vT2[[8]]$p.value
+  p.T1vT2 <- T1vT2[[10]]$p.value
+  p.input <- c(p.T1v0,p.T2v0,p.T1vT2)
+  p.output <- p.adjust(p.input, method="fdr", n=length(p.input))
+  
+  output <- matrix(NA,nrow=length(p.output),ncol=2)
+  colnames(output) <- c("orig","adj")
+  rownames(output) <- c("T1vO", "T2v0", "T1vT2")
+  output[,1] <- p.input
+  output[,2] <- p.output
+  write.table(output,file=paste0(dataDir,"Stats_TTest_dprime_corrected.txt"),sep="\t",row.names=T,col.names=T)
+  
+  
+  
+  
   ## make D' table
   df.out <- matrix(NA,nrow=dim(df.Master)[1],ncol=3)
   df.out[,1] <- as.character(df.Master[,1])
@@ -495,11 +514,28 @@ if(runStats == 1){
     }
   }
   
+  
   ## rerun stats without outliers
   #ttest
   T1vT2 <- ttest.Function(as.numeric(df.outlier[,2]),as.numeric(df.outlier[,3]),"T1","T2")
   h.out <- capture.output(print(T1vT2))
   write.table(h.out,paste0(dataDir,"Stats_TTest_dprime_T1vT2_noOutlier.txt"),row.names = F, quote = F, sep = '\t')
+  
+  
+  ## Correct for multiple comparisons on T-tests (ANOVA had no effects) - FDR. No/outliers separately
+  # Xoutliers
+  p.T1v0 <- T1vT2[[4]]$p.value
+  p.T2v0 <- T1vT2[[8]]$p.value
+  p.T1vT2 <- T1vT2[[10]]$p.value
+  p.input <- c(p.T1v0,p.T2v0,p.T1vT2)
+  p.output <- p.adjust(p.input, method="fdr", n=length(p.input))
+  
+  output <- matrix(NA,nrow=length(p.output),ncol=2)
+  colnames(output) <- c("orig","adj")
+  rownames(output) <- c("T1vO", "T2v0", "T1vT2")
+  output[,1] <- p.input
+  output[,2] <- p.output
+  write.table(output,file=paste0(dataDir,"Stats_TTest_dprime_corrected_noOutlier.txt"),sep="\t",row.names=T,col.names=T)
 
 }
 
@@ -514,18 +550,22 @@ if(makeGraphs == 1){
 
   ### T1vT2 (T1 = L->S)
   df.graph <- matrix(NA,nrow=dim(df.dprime)[1],ncol=2)
-  colnames(df.graph) <- c("L -> S","S -> L")
+  colnames(df.graph) <- c("1.5s","1s")
   df.graph[,1] <- df.dprime[,2]
   df.graph[,2] <- df.dprime[,3]
 
   tiff(paste0(outDir,"Exp2_Fig_T1vT2_dprime.tiff"), height = 5.5, width = 5.5, units = 'in', res=300)
   par(family="Times New Roman")
-  hold.graph <- boxplot(df.graph, ylim=c(-1,3), ylab="d' scores", col="white", cex.lab=1.5, cex.axis=1)
+  hold.graph <- boxplot(df.graph, ylim=c(-1,3.5), ylab="d' scores", col="white", cex.lab=1.5, cex.axis=1)
   title(main=list("Sensitivity to Duration", cex=1.5))
   abline(h = 0)
 
   par(xpd=TRUE)
   text(1,2.7,"***",cex=1)
   text(2,2.7,"***",cex=1)
+  segments(1,3,2,3,lwd=1,xpd=T)
+  arrows(1,3,2,3,lwd=1, angle=90, code=3, length = 0.05)
+  text(1.5,3.1,"*",cex=1)
+  
   dev.off()
 }
