@@ -629,7 +629,7 @@ if(makeGraphs == 1){
 
   ### T1vT2 (T1 = L->S)
   df.graph <- matrix(NA,nrow=dim(df.dprime)[1],ncol=2)
-  colnames(df.graph) <- c("L -> S","S -> L")
+  colnames(df.graph) <- c("1.5s","1s")
   df.graph[,1] <- df.dprime[,2]
   df.graph[,2] <- df.dprime[,3]
 
