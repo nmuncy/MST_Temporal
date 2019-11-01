@@ -23,41 +23,41 @@ makeGraphs <- 1
 
 
 ### Functions
-WLC.Function <- function(aa,bb,cc,dd){
-  
-  num.subj <- dim(df.Master)[1]
-  df.long <- as.data.frame(matrix(NA,nrow=(num.subj*4),ncol=4))
-  names(df.long) <- c("Subj","Dur","Lag","Dprime")
-  
-  #subject
-  df.long[,1] <- rep(as.character(df.Master[,1]),4)
-  
-  #duration
-  h.list <- c("T1","T2")
-  for(ii in 1:length(h.list)){
-    start=(ii*(2*num.subj))-((2*num.subj)-1)
-    end=(ii*(2*num.subj))
-    df.long[start:end,2] <- h.list[ii]
-  }
-  
-  #Lag
-  h.list <- c(rep(c("Lag4","Lag12"),2))
-  for(ii in 1:length(h.list)){
-    start=(ii*num.subj)-(num.subj-1)
-    end=(ii*num.subj)
-    df.long[start:end,3] <- h.list[ii]
-  }
-  
-  #Data
-  df.long[((1*num.subj)-(num.subj-1)):(1*num.subj),4] <- aa
-  df.long[((2*num.subj)-(num.subj-1)):(2*num.subj),4] <- bb
-  df.long[((3*num.subj)-(num.subj-1)):(3*num.subj),4] <- cc
-  df.long[((4*num.subj)-(num.subj-1)):(4*num.subj),4] <- dd
-  
-  df.long <- as.data.frame(df.long)
-  df.long$Dprime <- as.numeric(df.long$Dprime)
-  return(df.long)
-}
+# WLC.Function <- function(aa,bb,cc,dd){
+#   
+#   num.subj <- dim(df.Master)[1]
+#   df.long <- as.data.frame(matrix(NA,nrow=(num.subj*4),ncol=4))
+#   names(df.long) <- c("Subj","Dur","Lag","Dprime")
+#   
+#   #subject
+#   df.long[,1] <- rep(as.character(df.Master[,1]),4)
+#   
+#   #duration
+#   h.list <- c("T1","T2")
+#   for(ii in 1:length(h.list)){
+#     start=(ii*(2*num.subj))-((2*num.subj)-1)
+#     end=(ii*(2*num.subj))
+#     df.long[start:end,2] <- h.list[ii]
+#   }
+#   
+#   #Lag
+#   h.list <- c(rep(c("Lag4","Lag12"),2))
+#   for(ii in 1:length(h.list)){
+#     start=(ii*num.subj)-(num.subj-1)
+#     end=(ii*num.subj)
+#     df.long[start:end,3] <- h.list[ii]
+#   }
+#   
+#   #Data
+#   df.long[((1*num.subj)-(num.subj-1)):(1*num.subj),4] <- aa
+#   df.long[((2*num.subj)-(num.subj-1)):(2*num.subj),4] <- bb
+#   df.long[((3*num.subj)-(num.subj-1)):(3*num.subj),4] <- cc
+#   df.long[((4*num.subj)-(num.subj-1)):(4*num.subj),4] <- dd
+#   
+#   df.long <- as.data.frame(df.long)
+#   df.long$Dprime <- as.numeric(df.long$Dprime)
+#   return(df.long)
+# }
 
 dprime.Function <- function(df,string){
   

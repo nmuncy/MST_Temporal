@@ -22,46 +22,6 @@ res.Short <- " 3"
 
 
 ### Functions
-# WLC converts wide dataframes to long
-# dprime calculated d-prime scores for dataframes
-# ttest performs a post-hoc t and organizes output
-
-WLC.Function <- function(aa,bb,cc,dd){
-  
-  num.subj <- dim(df.Master)[1]
-  df.long <- as.data.frame(matrix(NA,nrow=(num.subj*4),ncol=4))
-  names(df.long) <- c("Subj","Dur","Lag","Dprime")
-  
-  #subject
-  df.long[,1] <- rep(as.character(df.Master[,1]),4)
-  
-  #duration
-  h.list <- c("T1","T2")
-  for(ii in 1:length(h.list)){
-    start=(ii*(2*num.subj))-((2*num.subj)-1)
-    end=(ii*(2*num.subj))
-    df.long[start:end,2] <- h.list[ii]
-  }
-  
-  #Lag
-  h.list <- c(rep(c("Lag4","Lag12"),2))
-  for(ii in 1:length(h.list)){
-    start=(ii*num.subj)-(num.subj-1)
-    end=(ii*num.subj)
-    df.long[start:end,3] <- h.list[ii]
-  }
-  
-  #Data
-  df.long[((1*num.subj)-(num.subj-1)):(1*num.subj),4] <- aa
-  df.long[((2*num.subj)-(num.subj-1)):(2*num.subj),4] <- bb
-  df.long[((3*num.subj)-(num.subj-1)):(3*num.subj),4] <- cc
-  df.long[((4*num.subj)-(num.subj-1)):(4*num.subj),4] <- dd
-  
-  df.long <- as.data.frame(df.long)
-  df.long$Dprime <- as.numeric(df.long$Dprime)
-  return(df.long)
-}
-
 dprime.Function <- function(df,string){
   
   x.df <- matrix(NA,nrow=dim(df)[1],ncol=5)
@@ -281,9 +241,6 @@ if(makeData == 1){
 
 ##### Step 2 Stats
 #
-# Compute adjusted d' scores for each lag as well
-# as collapsed across lags.
-# Test for effect of lag.
 # Test d's against zero and each other.
 # Account for potential outliers.
 
@@ -292,29 +249,7 @@ if(runStats == 1){
   df.Master <- read.delim(paste0(dataDir,"Master_Memory_bin_counts.txt"))
 
   ### Get d' scores
-  ## d'T1 L4 (L->S)
-  df.hold <- matrix(NA, nrow=dim(df.Master)[1],ncol=6)
-  df.hold[,1] <- as.numeric(df.Master$Hit_Same_T1_L4)
-  df.hold[,2] <- as.numeric(df.Master$Miss_Long_T1_L4)
-  df.hold[,3] <- as.numeric(df.Master$TargR_T1_L4)
-  df.hold[,4] <- as.numeric(df.Master$FA_Long_T1_L4)
-  df.hold[,5] <- as.numeric(df.Master$FA_Same_T1_L4)
-  df.hold[,6] <- as.numeric(df.Master$LureR_T1_L4)
-  T1L4 <- dprime.Function(df.hold)
-  
-  
-  ## d'T1 L12
-  df.hold <- matrix(NA, nrow=dim(df.Master)[1],ncol=6)
-  df.hold[,1] <- as.numeric(df.Master$Hit_Same_T1_L12)
-  df.hold[,2] <- as.numeric(df.Master$Miss_Long_T1_L12)
-  df.hold[,3] <- as.numeric(df.Master$TargR_T1_L12)
-  df.hold[,4] <- as.numeric(df.Master$FA_Long_T1_L12)
-  df.hold[,5] <- as.numeric(df.Master$FA_Same_T1_L12)
-  df.hold[,6] <- as.numeric(df.Master$LureR_T1_L12)
-  T1L12 <- dprime.Function(df.hold)
-  
-  
-  ## d'T1 (L4+12)
+  # d'T1
   df.hold <- matrix(NA, nrow=dim(df.Master)[1],ncol=6)
   df.hold[,1] <- as.numeric(df.Master$Hit_Same_T1_L4) + as.numeric(df.Master$Hit_Same_T1_L12)
   df.hold[,2] <- as.numeric(df.Master$Miss_Long_T1_L4) + as.numeric(df.Master$Miss_Long_T1_L12)
@@ -324,30 +259,7 @@ if(runStats == 1){
   df.hold[,6] <- as.numeric(df.Master$LureR_T1_L4) + as.numeric(df.Master$LureR_T1_L12)
   T1 <- dprime.Function(df.hold)
   
-  
-  ## d'T2 L4 (S->L)
-  df.hold <- matrix(NA, nrow=dim(df.Master)[1],ncol=6)
-  df.hold[,1] <- as.numeric(df.Master$Hit_Same_T2_L4)
-  df.hold[,2] <- as.numeric(df.Master$Miss_Short_T2_L4)
-  df.hold[,3] <- as.numeric(df.Master$TargR_T2_L4)
-  df.hold[,4] <- as.numeric(df.Master$FA_Short_T2_L4)
-  df.hold[,5] <- as.numeric(df.Master$FA_Same_T2_L4)
-  df.hold[,6] <- as.numeric(df.Master$LureR_T2_L4)
-  T2L4 <- dprime.Function(df.hold)
-  
-  
-  ## d'T2 L12
-  df.hold <- matrix(NA, nrow=dim(df.Master)[1],ncol=6)
-  df.hold[,1] <- as.numeric(df.Master$Hit_Same_T2_L12)
-  df.hold[,2] <- as.numeric(df.Master$Miss_Short_T2_L12)
-  df.hold[,3] <- as.numeric(df.Master$TargR_T2_L12)
-  df.hold[,4] <- as.numeric(df.Master$FA_Short_T2_L12)
-  df.hold[,5] <- as.numeric(df.Master$FA_Same_T2_L12)
-  df.hold[,6] <- as.numeric(df.Master$LureR_T2_L12)
-  T2L12 <- dprime.Function(df.hold)
-  
-  
-  ## d'T2
+  # d'T2
   df.hold <- matrix(NA, nrow=dim(df.Master)[1],ncol=6)
   df.hold[,1] <- as.numeric(df.Master$Hit_Same_T2_L4) + as.numeric(df.Master$Hit_Same_T2_L12)
   df.hold[,2] <- as.numeric(df.Master$Miss_Short_T2_L4) + as.numeric(df.Master$Miss_Short_T2_L12)
@@ -358,30 +270,34 @@ if(runStats == 1){
   T2 <- dprime.Function(df.hold)
   
   
-  ## Test d' scores
-  df.anova <- WLC.Function(T1L4,T1L12,T2L4,T2L12)
-  anova.out <- ezANOVA(df.anova,dv=Dprime,wid=Subj,within=c(Dur,Lag),type='III')
-  h.out <- capture.output(print(anova.out))
-  write.table(h.out,paste0(dataDir,"Stats_Anova_dprime_DurXLag.txt"),row.names = F, quote = F, sep = '\t')
-  
-  
   #ttest
   T1vT2 <- ttest.Function(T1,T2,"T1","T2")
   h.out <- capture.output(print(T1vT2))
   write.table(h.out,paste0(dataDir,"Stats_TTest_dprime_T1vT2.txt"),row.names = F, quote = F, sep = '\t')
   
   
+  ## Correct for multiple comparisons on T-tests - FDR. No/outliers separately
+  # outliers
+  p.T1v0 <- T1vT2[[4]]$p.value
+  p.T2v0 <- T1vT2[[8]]$p.value
+  p.T1vT2 <- T1vT2[[10]]$p.value
+  p.input <- c(p.T1v0,p.T2v0,p.T1vT2)
+  p.output <- p.adjust(p.input, method="fdr", n=length(p.input))
+  
+  output <- matrix(NA,nrow=length(p.output),ncol=2)
+  colnames(output) <- c("orig","adj")
+  rownames(output) <- c("T1vO", "T2v0", "T1vT2")
+  output[,1] <- p.input
+  output[,2] <- p.output
+  write.table(output,file=paste0(dataDir,"Stats_TTest_dprime_corrected.txt"),sep="\t",row.names=T,col.names=T)
+  
   
   ## make D' table
-  df.out <- matrix(NA,nrow=dim(df.Master)[1],ncol=7)
+  df.out <- matrix(NA,nrow=dim(df.Master)[1],ncol=3)
   df.out[,1] <- as.character(df.Master[,1])
   df.out[,2] <- round(T1,2)
   df.out[,3] <- round(T2,2)
-  df.out[,4] <- round(T1L4,2)
-  df.out[,5] <- round(T1L12,2)
-  df.out[,6] <- round(T2L4,2)
-  df.out[,7] <- round(T2L12,2)
-  colnames(df.out) <- c("Subj","T1","T2","T1L4","T1L12","T2L4","T2L12")
+  colnames(df.out) <- c("Subj","T1","T2")
   write.table(df.out,paste0(dataDir,"Master_dprime.txt"),row.names = F, quote = F, sep = '\t')
   
   
@@ -407,8 +323,8 @@ if(runStats == 1){
   
   
   ## remove outliers - replace with col median
-  df.outlier <- matrix(NA,nrow=dim(df.Master)[1],ncol=7)
-  colnames(df.outlier) <- c("Subj","T1","T2","T1L4","T1L12","T2L4","T2L12")
+  df.outlier <- matrix(NA,nrow=dim(df.Master)[1],ncol=3)
+  colnames(df.outlier) <- c("Subj","T1","T2")
   for(i in 1:dim(df.outlier)[1]){
     
     subj <- df.out[i,1]
@@ -429,16 +345,26 @@ if(runStats == 1){
   }
   
   ## rerun stats without outliers
-  #anova
-  df.outlier_long <- WLC.Function(df.outlier[,4],df.outlier[,5],df.outlier[,6],df.outlier[,7])
-  anova.no_out <- ezANOVA(df.outlier_long,dv=Dprime,wid=Subj,within=c(Dur,Lag),type='III')
-  h.out <- capture.output(print(anova.no_out))
-  write.table(h.out,paste0(dataDir,"Stats_Anova_dprime_DurXLag_noOutlier.txt"),row.names = F, quote = F, sep = '\t')
-  
   #ttest
   T1vT2 <- ttest.Function(as.numeric(df.outlier[,2]),as.numeric(df.outlier[,3]),"T1","T2")
   h.out <- capture.output(print(T1vT2))
   write.table(h.out,paste0(dataDir,"Stats_TTest_dprime_T1vT2_noOutlier.txt"),row.names = F, quote = F, sep = '\t')
+  
+  
+  ## Correct for multiple comparisons on T-tests (ANOVA had no effects) - FDR. No/outliers separately
+  # Xoutliers
+  p.T1v0 <- T1vT2[[4]]$p.value
+  p.T2v0 <- T1vT2[[8]]$p.value
+  p.T1vT2 <- T1vT2[[10]]$p.value
+  p.input <- c(p.T1v0,p.T2v0,p.T1vT2)
+  p.output <- p.adjust(p.input, method="fdr", n=length(p.input))
+
+  output <- matrix(NA,nrow=length(p.output),ncol=2)
+  colnames(output) <- c("orig","adj")
+  rownames(output) <- c("T1vO", "T2v0", "T1vT2")
+  output[,1] <- p.input
+  output[,2] <- p.output
+  write.table(output,file=paste0(dataDir,"Stats_TTest_dprime_corrected_noOutlier.txt"),sep="\t",row.names=T,col.names=T)
 }
 
 
