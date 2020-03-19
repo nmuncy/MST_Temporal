@@ -629,14 +629,14 @@ if(makeGraphs == 1){
 
   ### T1vT2 (T1 = L->S)
   df.graph <- matrix(NA,nrow=dim(df.dprime)[1],ncol=2)
-  colnames(df.graph) <- c("1.5s","1s")
+  colnames(df.graph) <- c("L->S","S->L")
   df.graph[,1] <- df.dprime[,2]
   df.graph[,2] <- df.dprime[,3]
 
   tiff(paste0(outDir,"Exp1_Plot_T1vT2_dprime.tiff"), height = 5.5, width = 5.5, units = 'in', res=300)
   par(family="Times New Roman")
   hold.graph <- boxplot(df.graph, ylim=c(-1,3), ylab="d' scores", col="white", cex.lab=1.5, cex.axis=1)
-  title(main=list("Sensitivity to Duration", cex=1.5))
+  title(main=list("Experiment One", cex=1.5))
   abline(h = 0)
 
   par(xpd=TRUE)
