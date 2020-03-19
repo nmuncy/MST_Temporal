@@ -86,8 +86,10 @@ if [ $runCount != $totBlock ]; then
 fi
 
 # check blips
+cd ${dataDir}/fmap
+
 if [ $blip == 1 ]; then
-	blipCount=`ls *phase*.nii.gz | wc -l`
+	blipCount=`ls *epi.nii.gz | wc -l`
 	if [ $blipCount != $phaseLen ]; then
 		echo "Number of blips != number of phases. Exit 3" >&2
 		exit 3
@@ -98,6 +100,8 @@ fi
 
 ### Copy data
 # 3dcopy/rename epi data according to phase membership, determine number of blocks and set block arr
+cd ${dataDir}/func
+
 c=0; for i in *run*.nii.gz; do
 
 	tmp=${i%_bold*}
@@ -124,10 +128,12 @@ numRuns=${#block[@]}
 
 
 # blip data
+cd ${dataDir}/fmap
+
 if [ $blip == 1 ]; then
 	for((i=1; i<=$blipCount; i++)); do
 		if [ ! -f ${workDir}/phase${i}_Blip+orig.HEAD ]; then
-			3dcopy *phase-${i}_blip.nii.gz ${workDir}/phase${i}_Blip+orig
+			3dcopy *run-${i}_epi.nii.gz ${workDir}/phase${i}_Blip+orig
 		fi
 	done
 fi
