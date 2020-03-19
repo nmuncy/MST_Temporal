@@ -90,6 +90,14 @@ SE.Function <- function(x,plot_data){
   return(SD)
 }
 
+
+# Graph.Function(df,comp,anat,mvm_statsDir)
+# DF <- df
+# output_name <- comp
+# maskN <- anat
+# out_place <- mvm_statsDir
+
+
 Graph.Function <- function(DF,output_name,maskN,out_place){
   
   TITLE <- maskN
@@ -116,11 +124,12 @@ Graph.Function <- function(DF,output_name,maskN,out_place){
     graphOut <- paste0(graphDir,"Exp3_Plot_",output_name,"_",TITLE,".tiff")
     bitmap(graphOut, width = 6.5, units = 'in', type="tiff24nc", res=1200)
   }
-  barCenters <- barplot(plotable[1,], names.arg = c(XNAMES), main=ROI, ylab="Beta Coefficient",ylim=RANGE)
+  par(mar=c(4,5,4,2))
+  barCenters <- barplot(plotable[1,], names.arg = c(XNAMES), main=ROI, ylab="Beta Coefficient", ylim=RANGE, cex.main=2, cex.axis = 1.5, cex.lab=1.5, cex.names=1.5)
   segments(barCenters, MEANS-E.BARS, barCenters, MEANS+E.BARS)
   arrows(barCenters, MEANS-E.BARS, barCenters, MEANS+E.BARS, lwd = 1, angle = 90, code = 3, length = 0.05)
   set.pos <- rowMeans(plotable); if(set.pos[1]>0){POS<-3}else{POS<-1}
-  text(barCenters,0,round(plotable[1,],4),cex=1,pos=POS,font=2)
+  text(barCenters,0,round(plotable[1,],4),cex=1.5,pos=POS,font=2)
   if(doWrite == 1){
     dev.off()
   }
